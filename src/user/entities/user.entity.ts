@@ -1,77 +1,108 @@
-import { ObjectType, Field, Int, registerEnumType, InputType } from '@nestjs/graphql';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
+import { compare, hash } from 'bcrypt';
 import {
   IsIn,
   IsOptional,
   IsPhoneNumber,
   IsString,
   Length,
+  ValidateNested,
 } from 'class-validator';
-import { CoreEntity } from 'src/common/entities/common.entity';
+import { CoreEntity } from 'src/common/entities/core.entity';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 export enum VaitroNguoiDung {
-  Admin = 'admin',
+  Admin = 'Admin',
   NguoiDan = 'NguoiDan',
-  ToTruong = "ToTruong",
+  ToTruong = 'ToTruong',
   ToPho = 'ToPho',
 }
 registerEnumType(VaitroNguoiDung, {
-  name: "VaitroNguoiDung",
+  name: 'VaitroNguoiDung',
 });
-@InputType('userInputType', { isAbstract: true })
+
+@InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class User extends CoreEntity {
   @Field()
   @Column()
   @Length(12, 12)
-  cancuocCongDan: string;
+  canCuocCongDan: string;
+
   @Field()
   @Column()
   @IsPhoneNumber('VN', {
     message: 'Số điện thoại sai định dạng',
   })
   soDienThoai: string;
+
   @Field(() => VaitroNguoiDung)
   @Column('enum', {
     enum: VaitroNguoiDung,
     default: VaitroNguoiDung.NguoiDan,
   })
   vaiTro: VaitroNguoiDung;
+
   @Field()
   @Column({ default: false })
   daDangKi: boolean;
+
   @Field({ nullable: true })
   @Column({ select: false, nullable: true })
   @IsString()
   matKhau: string;
+
+  @Field()
+  @Column()
+  @IsString()
+  ten: string;
+
   @Field()
   @Column()
   @IsIn(['Nam', 'Nữ'])
-  gioitinh: string;
+  gioiTinh: string;
+
   @Field({ nullable: true })
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
-  bidanh: string;
+  biDanh?: string;
+
   @Field(() => Date)
-  @Column('timestamp with out time zone')
+  @Column('timestamp without time zone')
   @IsString()
   ngaySinh: Date;
+
   @Field()
   @Column()
   noiSinh: string;
+
   @Field()
   @Column()
   queQuan: string;
+
   @Field()
   @Column()
-  noiThuongTru: string;
+  noiThuongTruTruocDo: string;
+
   @Field()
   @Column()
   ngheNghiep: string;
+
   @Field()
   @Column()
   danToc: string;
+
+  @Field(() => StoredFile, { nullable: true })
+  @Column('json', { nullable: true })
+  @ValidateNested()
+  avatar?: StoredFile;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
@@ -82,5 +113,4 @@ export class User extends CoreEntity {
   async checkPassword(matKhau: string): Promise<Boolean> {
     return await compare(matKhau, this.matKhau);
   }
-
 }

@@ -1,26 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { InjectRepository } from '@nestjs/typeorm';
+import { createError } from 'src/common/utils/createError';
+import { Repository } from 'typeorm';
+import {
+  AddUserInput,
+  AddUserOutput,
+  UserDetailInput,
+  UserDetailOutput,
+} from './dto/user.dto';
+import { User, VaitroNguoiDung } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(createUserInput: CreateUserInput) {
-    return 'This action adds a new user';
+ constructor(
+  @InjectRepository(User) private readonly userRepo:Repository<User>,
+ ){}
+ async addUser(input:AddUserInput): Promise<AddUserOutput>{
+  try {
+    const User=this.userRepo.findOne({
+      where:{
+        canCuocCongDan:input.canCuocCongDan,
+      },
+    });
+    if(User) return createError('Input',"Đã tồn tại căn cước công dân này")
+    await this.userRepo.save(this.userRepo.create({...input}));
+  } catch (error) {
+    return createError('Server','Lỗi server,thử lại sau');
   }
-
-  findAll() {
-    return `This action returns all user`;
+ }
+ async getUserDetail(
+  currentUser: User,
+  { id }: UserDetailInput,
+): Promise<UserDetailOutput> {
+  try {
+    if (
+      ![VaitroNguoiDung.ToPho, VaitroNguoiDung.ToTruong].includes(
+        currentUser.vaiTro,
+      ) &&
+      +currentUser.id !== +id
+    )
+      return createError('Input', 'Bạn không có quyền xem thông tin này');
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) return createError('Input', 'Id không hợp lệ');
+    return {
+      ok: true,
+      user,
+    };
+  } catch (error) {
+    return createError('Server', 'Lỗi server, thử lại sau');
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+}
 }
