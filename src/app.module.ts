@@ -11,6 +11,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { Request } from 'express';
 import { User } from './user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           : {}),
       }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
