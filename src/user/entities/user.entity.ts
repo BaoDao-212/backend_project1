@@ -36,9 +36,7 @@ export class User extends CoreEntity {
 
   @Field()
   @Column()
-  @IsPhoneNumber('VN', {
-    message: 'Số điện thoại sai định dạng',
-  })
+  @IsPhoneNumber('VN', { message: 'Số điện thoại sai định dạng',})
   soDienThoai: string;
 
   @Field(() => VaitroNguoiDung)
@@ -98,10 +96,7 @@ export class User extends CoreEntity {
   @Column()
   danToc: string;
 
-  @Field(() => StoredFile, { nullable: true })
-  @Column('json', { nullable: true })
-  @ValidateNested()
-  avatar?: StoredFile;
+
 
   @BeforeInsert()
   @BeforeUpdate()
