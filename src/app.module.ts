@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { User } from './user/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { DataModule } from './data/data.module';
 
 
 @Module({
@@ -54,6 +55,7 @@ import { AuthModule } from './auth/auth.module';
       }),
     UserModule,
     AuthModule,
+    DataModule,
   ],
   controllers: [AppController],
   providers: [AppService],

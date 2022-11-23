@@ -5,13 +5,13 @@ import { LoginInput, LoginOutput, RegisterUserInput, RegisterUserOutput } from '
 
 @Resolver(() => Auth)
 export class AuthResolver {
-  constructor(private readonly authService:AuthService){}
-  @Mutation(()=>RegisterUserOutput)
-  registerUser(@Args('input') input:RegisterUserInput){
+  constructor(private readonly authService: AuthService) { }
+  @Mutation(() => RegisterUserOutput)
+  registerUser(@Args('input') input: RegisterUserInput) {
     return this.authService.registerUser(input);
   }
-  @Query(()=>LoginOutput)
-  login(@Args('input') input:LoginInput){
+  @Query(() => LoginOutput)
+  login(@Args('input') input: LoginInput) {
     return this.authService.login(input);
   }
 
