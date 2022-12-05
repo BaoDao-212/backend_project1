@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { range, sample, sampleSize } from 'lodash';
-import { stat } from 'fs';
 const alphabetLetters = range(26).map((e) => [
   String.fromCharCode(e + 'a'.charCodeAt(0)),
   String.fromCharCode(e + 'A'.charCodeAt(0)),

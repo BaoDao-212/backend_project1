@@ -15,10 +15,11 @@ import { FirebaseModule } from './firebase/firebase.module';
 import { SMSModule } from './sms/sms.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
+import { HokhauModule } from './hokhau/hokhau.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
         process.env.NODE_ENV === 'dev'
@@ -33,11 +34,11 @@ import { UserModule } from './user/user.module';
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
-        FIREBASE_API_KEY: Joi.string().required(),
-        FIREBASE_AUTH_DOMAIN: Joi.string().required(),
-        FIREBASE_PROJECT_ID: Joi.string().required(),
-        FIREBASE_STORAGE_BUCKET: Joi.string().required(),
-        FIREBASE_APP_ID: Joi.string().required(),
+        // FIREBASE_API_KEY: Joi.string().required(),
+        // FIREBASE_AUTH_DOMAIN: Joi.string().required(),
+        // FIREBASE_PROJECT_ID: Joi.string().required(),
+        // FIREBASE_STORAGE_BUCKET: Joi.string().required(),
+        // FIREBASE_APP_ID: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -98,8 +99,13 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     DataModule,
+    HokhauModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(){
+    console.log(process.env)
+  }
+}
