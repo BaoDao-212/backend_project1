@@ -12,7 +12,6 @@ import { HokhauService } from './services/hokhau.service';
 import { TamTruService } from './services/tamtru.service';
 import { TamVangService } from './services/tamvang.service';
 
-
 @Module({
   providers: [
     HokhauService,
@@ -24,9 +23,6 @@ import { TamVangService } from './services/tamvang.service';
   ],
   imports: [
     TypeOrmModule.forFeature([HoKhau, User, LichSuHoKhau, TamTru, TamVang]),
-
-
-
   ],
 })
 export class HokhauModule {}

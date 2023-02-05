@@ -3,10 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { range, sample, sampleSize } from 'lodash';
-const alphabetLetters = range(26).map((e) => [
-  String.fromCharCode(e + 'a'.charCodeAt(0)),
-  String.fromCharCode(e + 'A'.charCodeAt(0)),
-]).flat();
+const alphabetLetters = range(26)
+  .map((e) => [
+    String.fromCharCode(e + 'a'.charCodeAt(0)),
+    String.fromCharCode(e + 'A'.charCodeAt(0)),
+  ])
+  .flat();
 
 @Injectable()
 export class DataService {
@@ -15,7 +17,7 @@ export class DataService {
     private readonly userRepo: Repository<User>,
   ) {
     this.generateUserData(100);
-   }
+  }
   async generateUserData(soLuong: number) {
     const ho = [
       'Nguyễn',
@@ -30,8 +32,7 @@ export class DataService {
       'Dương',
       'Lê',
       'Trịnh',
-
-    ]
+    ];
     const tenDem = [
       'Văn',
       'Thùy',
@@ -46,7 +47,7 @@ export class DataService {
       'Thúy',
       'Thu',
       'Mỹ',
-    ]
+    ];
     const ten = [
       'Long',
       'Ly',
@@ -55,7 +56,7 @@ export class DataService {
       'Khang',
       'Tường',
       'Quỳnh',
-      "Uyên",
+      'Uyên',
       'Hoài',
       'Hùng',
       'Khánh',
@@ -68,7 +69,7 @@ export class DataService {
       'Hiền',
       'Phương',
       'Huyền',
-    ]
+    ];
     const ngheNghiep = [
       'Giáo viên',
       'Nông dân',
@@ -118,18 +119,27 @@ export class DataService {
         this.userRepo.create({
           ten: `${sample(ho)} ${sample(tenDem)} ${sample(ten)}`,
           biDanh: `Bi danh ${sampleSize(alphabetLetters, 4).join('')}`,
-          canCuocCongDan: `0${sampleSize(range(0, 10), 1)}02020${sampleSize(range(0, 10), 6).join('')}`,
+          canCuocCongDan: `0${sampleSize(range(1, 10), 1)}02020${sampleSize(
+            range(0, 10),
+            5,
+          ).join('')}`,
           ngheNghiep: sample(ngheNghiep),
           danToc: 'Kinh',
           daDangKi: false,
           noiSinh: sample(temp),
           queQuan: sample(temp),
-          noiThuongTruTruocDo: `${sampleSize(alphabetLetters, 2).join('')}, ${sampleSize(alphabetLetters, sample([4, 5, 6])).join('')}, , ${sample(noiSinh)}`,
-          soDienThoai: `${sample(dauSoDT)}${sampleSize(range(0, 9), 7).join('')}`,
+          noiThuongTruTruocDo: `${sampleSize(alphabetLetters, 2).join(
+            '',
+          )}, ${sampleSize(alphabetLetters, sample([4, 5, 6])).join(
+            '',
+          )}, , ${sample(noiSinh)}`,
+          soDienThoai: `${sample(dauSoDT)}${sampleSize(range(0, 9), 7).join(
+            '',
+          )}`,
           ngaySinh: new Date(
             new Date(
               start.getTime() +
-              Math.random() * (end.getTime() - start.getTime()),
+                Math.random() * (end.getTime() - start.getTime()),
             ).setHours(0, 0, 0, 0),
           ),
           gioiTinh: sample(['Nam', 'Nữ']),

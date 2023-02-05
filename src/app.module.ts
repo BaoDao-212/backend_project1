@@ -16,10 +16,17 @@ import { SMSModule } from './sms/sms.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 import { HokhauModule } from './hokhau/hokhau.module';
+import { HoKhau } from './hokhau/entities/hokhau.entity';
+import { LichSuHoKhau } from './hokhau/entities/lichsuhokhau.entity';
+import { DongGop } from './khoanphi/entities/donggop.entity';
+import { KhoanPhi } from './khoanphi/entities/khoanphi.entity';
+import { KhoanPhiModule } from './khoanphi/khoanphi.module';
+import { TamTru } from './hokhau/entities/tamtru.entity';
+import { TamVang } from './hokhau/entities/tamvang.entity';
 
 @Module({
   imports: [
-     ConfigModule.forRoot({
+    ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
         process.env.NODE_ENV === 'dev'
@@ -44,19 +51,19 @@ import { HokhauModule } from './hokhau/hokhau.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       debug: false,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'src/generated/schema.gql'),
       playground: true,
       context: ({ req, res }: { req: Request; res: Response }) => {
         return { req, res, [ACCESS_TOKEN]: req.get(ACCESS_TOKEN) };
       },
-      // cors: {
-      //   origin: [
-      //     process.env.CLIENT_DOMAIN,
-      //     process.env.SERVER_DOMAIN,
-      //     process.env.DEV_DOMAIN,
-      //   ],
-      //   credentials: true,
-      // },
+      cors: {
+        origin: [
+          process.env.CLIENT_DOMAIN,
+          process.env.SERVER_DOMAIN,
+          (process.env.DEV_DOMAIN = 'http://localhost:5173'),
+        ],
+        credentials: true,
+      },
     }),
     SMSModule.forRoot({
       accountSID: process.env.SMS_ACCOUNT_SID,
@@ -82,7 +89,15 @@ import { HokhauModule } from './hokhau/hokhau.module';
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_NAME,
           }),
-      entities: [User],
+      entities: [
+        User,
+        HoKhau,
+        LichSuHoKhau,
+        DongGop,
+        KhoanPhi,
+        TamTru,
+        TamVang,
+      ],
       synchronize: true,
       ...(process.env.NODE_ENV === 'production'
         ? {
@@ -100,12 +115,13 @@ import { HokhauModule } from './hokhau/hokhau.module';
     AuthModule,
     DataModule,
     HokhauModule,
+    KhoanPhiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  constructor(){
-    console.log(process.env)
+  constructor() {
+    console.log(process.env);
   }
 }

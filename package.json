@@ -38,7 +38,7 @@
     "graphql": "^16.6.0",
     "joi": "^17.7.0",
     "js-yaml": "^4.1.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",
     "mysql2": "^2.3.3",
     "nestjs-joi": "^1.8.2",
@@ -47,7 +47,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "sharp": "^0.31.2",
-    "twilio": "^3.83.3",
+    "twilio": "^2.5.2",
     "typeorm": "^0.3.10"
   },
   "devDependencies": {

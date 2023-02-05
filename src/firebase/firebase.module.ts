@@ -7,7 +7,6 @@ import { FirebaseService } from './firebase.service';
 export class FirebaseModule {
   static forRoot(options: FirebaseConfigOption): DynamicModule {
     return {
-      
       module: FirebaseModule,
       global: true,
       providers: [

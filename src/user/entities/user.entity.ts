@@ -15,6 +15,8 @@ import {
 } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { HoKhau } from 'src/hokhau/entities/hokhau.entity';
+import { TamTru } from 'src/hokhau/entities/tamtru.entity';
+import { TamVang } from 'src/hokhau/entities/tamvang.entity';
 import { StoredFile } from 'src/upload/object/StoredFile';
 import {
   BeforeInsert,
@@ -22,7 +24,9 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   RelationId,
+  Unique,
 } from 'typeorm';
 
 export enum VaitroNguoiDung {
@@ -30,6 +34,7 @@ export enum VaitroNguoiDung {
   NguoiDan = 'NguoiDan',
   ToTruong = 'ToTruong',
   ToPho = 'ToPho',
+  KeToan = 'KeToan',
 }
 
 export enum VaiTroThanhVien {
@@ -60,6 +65,8 @@ registerEnumType(VaiTroThanhVien, {
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
+@Unique(['canCuocCongDan'])
+@Unique(['soDienThoai'])
 export class User extends CoreEntity {
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -98,8 +105,6 @@ export class User extends CoreEntity {
   @Column({ default: false })
   daDangKi: boolean;
 
-
-
   @Field()
   @Column()
   @IsString()
@@ -110,19 +115,14 @@ export class User extends CoreEntity {
   @IsIn(['Nam', 'Nữ'])
   gioiTinh: string;
 
-
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   biDanh?: string;
-
-
 
   @Field(() => Date)
   @Column('timestamp without time zone')
   ngaySinh: Date;
 
-  
   @Field()
   @Column()
   noiSinh: string;
@@ -184,7 +184,7 @@ export class User extends CoreEntity {
     this.matKhau = await hash(this.matKhau, 12);
   }
 
-  async checkPassword(matKhau: string): Promise<Boolean> {
+  async checkPassword(matKhau: string): Promise<boolean> {
     return await compare(matKhau, this.matKhau);
   }
 }

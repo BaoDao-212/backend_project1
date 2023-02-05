@@ -16,6 +16,8 @@ import {
   NewAccessTokenOutput,
   RegisterUserInput,
   RegisterUserOutput,
+  ChangePasswordInput,
+  ChangePasswordOutput,
 } from './dto/auth.dto';
 
 @Injectable()
@@ -41,6 +43,8 @@ export class AuthService {
       });
       if (!user)
         return createError('Input', 'Số căn cước công dân không phù hợp');
+      if (user.daDangKi)
+        return createError('Input', 'Tài khoản đã được đăng kí');
       user.matKhau = matKhau;
       user.daDangKi = true;
       await this.userRepo.save(user);
@@ -67,9 +71,8 @@ export class AuthService {
           'Input',
           'Số căn cước công dân chưa được đăng kí tài khoản',
         );
-      console.log(await user.checkPassword(matKhau));
       if (!(await user.checkPassword(matKhau)))
-        return createError('Input', 'Mật khẩu không hợp lệ');
+        return createError('Input', 'Mật khẩu không đúng');
       const accessToken = sign(
         {
           userId: user.id,
@@ -84,7 +87,6 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
-      console.log(error);
       return createError('Server', 'Lỗi server, thử lại sau');
     }
   }
@@ -114,6 +116,45 @@ export class AuthService {
     } catch (err) {
       if (err instanceof JsonWebTokenError)
         return createError('accessToken', 'Người dùng không hợp lệ!');
+      return createError('Server', 'Lỗi server, thử lại sau');
+    }
+  }
+
+  async changePassword(
+    currentUser: User,
+    input: ChangePasswordInput,
+  ): Promise<ChangePasswordOutput> {
+    try {
+      const { matKhauCu, matKhauMoi, matKhauMoiLapLai } = input;
+      const user = await this.userRepo.findOne({
+        where: { id: currentUser.id },
+        select: ['matKhau', 'id'],
+      });
+
+      //kiem tra User ton tai khong
+      if (!user) createError('Input', 'Người dùng không tồn tại');
+
+      //kiem tra mat khau hien tai dung hay khong
+      if (!(await user.checkPassword(matKhauCu)))
+        return createError('Input', 'Mật khẩu hiện tại không đúng');
+
+      //Kiem tra mat khau moi va mat khau nhap lai co trung nhau hay khong
+      if (matKhauMoi !== matKhauMoiLapLai)
+        return createError('Input', 'Mật khẩu lặp lại không khớp');
+
+      //kiem tra mat khau cu va mat khau moi co trung nhau khong
+      if (await user.checkPassword(matKhauMoi))
+        return createError(
+          'Input',
+          'Mật khẩu mới không được trùng mật khẩu cũ',
+        );
+
+      user.matKhau = matKhauMoi;
+      await this.userRepo.save(user);
+      return {
+        ok: true,
+      };
+    } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');
     }
   }

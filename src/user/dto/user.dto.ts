@@ -1,34 +1,40 @@
 import {
-    Field,
-    ID,
-    InputType,
-    ObjectType,
-    OmitType,
-    PartialType,
-    PickType,
-  } from '@nestjs/graphql';
-  import {
-    CoreOutput,
-    PaginationInput,
-    PaginationOutput,
-  } from 'src/common/dto/output.dto';
-  import { User } from '../entities/user.entity';
-  
-  @InputType()
-  export class AddUserInput extends OmitType(User, [
-    'checkPassword',
-    'createdAt',
-    'updatedAt',
-    'hashPassword',
-    'matKhau',
-    'vaiTroNguoiDung',
-  ]) {}
-  
-  @ObjectType()
-  export class AddUserOutput extends CoreOutput {}
-  
-  @InputType()
-  export class EditUserInput extends OmitType(User, [
+  Field,
+  ID,
+  InputType,
+  ObjectType,
+  OmitType,
+  PartialType,
+} from '@nestjs/graphql';
+import {
+  CoreOutput,
+  PaginationInput,
+  PaginationOutput,
+} from 'src/common/dto/output.dto';
+import { User } from '../entities/user.entity';
+
+@InputType()
+export class AddUserInput extends OmitType(User, [
+  'id',
+  'checkPassword',
+  'createdAt',
+  'updatedAt',
+  'hashPassword',
+  'matKhau',
+  'vaiTroNguoiDung',
+  'vaiTroThanhVien',
+  'daDangKi',
+  'hoKhau',
+  'tamTru',
+  'ngayDangKiThuongTru',
+]) {}
+
+@ObjectType()
+export class AddUserOutput extends CoreOutput {}
+
+@InputType()
+export class EditUserInput extends PartialType(
+  OmitType(User, [
     'checkPassword',
     'createdAt',
     'updatedAt',
@@ -40,44 +46,70 @@ import {
     'hoKhau',
     'hoKhauId',
     'tamTru',
-  ]) {
-    @Field(() => ID)
-    nguoiYeuCauId: number;
-  }
-  
-  @ObjectType()
-  export class EditUserOutput extends CoreOutput {}
-  
-  @ObjectType()
-  export class XemThongTinNguoiDungOutput extends CoreOutput {
-    @Field(() => User, { nullable: true })
-    user?: User;
-  }
-  
-  @InputType()
-  export class XemThongTinNguoiDungChoQuanLiInput {
-    @Field(() => ID)
-    userId: number;
-  }
-  
-  @InputType()
-  export class XemDanhSachNguoiDungInput {
-    @Field(() => PaginationInput)
-    paginationInput: PaginationInput;
-  
-    @Field({ nullable: true })
-    hoTen?: string;
-  
-    @Field({ nullable: true })
-    canCuocCongDan?: string;
-  }
-  
-  @ObjectType()
-  export class XemDanhSachNguoiDungOutput extends CoreOutput {
-    @Field(() => PaginationOutput, { nullable: true })
-    paginationOutput?: PaginationOutput;
-  
-    @Field(() => [User], { nullable: true })
-    users?: User[];
-  }
-  
+    'id',
+    'vaiTroThanhVien',
+  ]),
+) {
+  @Field(() => ID)
+  nguoiYeuCauId: number;
+}
+
+@ObjectType()
+export class EditUserOutput extends CoreOutput {}
+
+@ObjectType()
+export class XemThongTinNguoiDungOutput extends CoreOutput {
+  @Field(() => User, { nullable: true })
+  user?: User;
+}
+
+@InputType()
+export class XemThongTinNguoiDungChoQuanLiInput {
+  @Field(() => ID)
+  userId: number;
+}
+
+@InputType()
+export class XemDanhSachNguoiDungInput {
+  @Field(() => PaginationInput)
+  paginationInput: PaginationInput;
+
+  @Field({ nullable: true })
+  hoTen?: string;
+
+  @Field({ nullable: true })
+  canCuocCongDan?: string;
+}
+
+@ObjectType()
+export class XemDanhSachNguoiDungOutput extends CoreOutput {
+  @Field(() => PaginationOutput, { nullable: true })
+  paginationOutput?: PaginationOutput;
+
+  @Field(() => [User], { nullable: true })
+  users?: User[];
+}
+
+@ObjectType()
+export class ThongKeUserOuput extends CoreOutput {
+  @Field(() => Number, { nullable: true })
+  soNguoiDangKi?: number;
+
+  @Field(() => Number, { nullable: true })
+  soNguoiDangKiTamTru?: number;
+
+  @Field(() => Number, { nullable: true })
+  soNguoiDangKiTamVang?: number;
+
+  @Field(() => Number, { nullable: true })
+  soHo?: number;
+
+  @Field(() => Number, { nullable: true })
+  soNguoiDuoiLaoDong?: number;
+
+  @Field(() => Number, { nullable: true })
+  soNguoiTrongLaoDong?: number;
+
+  @Field(() => Number, { nullable: true })
+  soNguoiTrenLaoDong?: number;
+}

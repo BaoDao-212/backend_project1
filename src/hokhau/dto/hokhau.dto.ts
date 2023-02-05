@@ -1,5 +1,9 @@
 import { Field, ID, InputType, ObjectType } from '@nestjs/graphql';
-import { CoreOutput } from 'src/common/dto/output.dto';
+import {
+  CoreOutput,
+  PaginationInput,
+  PaginationOutput,
+} from 'src/common/dto/output.dto';
 import { VaiTroThanhVien } from 'src/user/entities/user.entity';
 import { HoKhau } from '../entities/hokhau.entity';
 import { LichSuHoKhau } from '../entities/lichsuhokhau.entity';
@@ -88,11 +92,47 @@ export class XoaNguoiKhoiHoKhauOutput extends CoreOutput {}
 @InputType()
 export class XemLichSuThayDoiNhanKhauInput {
   @Field(() => ID)
-  hoKhauId: number;
+  hoKhauId?: number;
 }
 
 @ObjectType()
 export class XemLichSuThayDoiNhanKhauOutput extends CoreOutput {
-  @Field(() => LichSuHoKhau, { nullable: true })
+  @Field(() => [LichSuHoKhau], { nullable: true })
   lichSuHoKhau?: LichSuHoKhau[];
 }
+
+@InputType()
+export class XemDanhSachHoKhauInput {
+  @Field(() => PaginationInput)
+  paginationInput: PaginationInput;
+
+  @Field({ nullable: true })
+  soHoKhau?: string;
+}
+
+@ObjectType()
+export class XemDanhSachHoKhauOutput extends CoreOutput {
+  @Field(() => PaginationOutput, { nullable: true })
+  paginationOutput?: PaginationOutput;
+
+  @Field(() => [HoKhau], { nullable: true })
+  hoKhau?: HoKhau[];
+}
+
+@InputType()
+export class CapNhatHoKhauInput {
+  @Field(() => ID)
+  hoKhauId: number;
+
+  @Field(() => ID)
+  nguoiYeuCauId: number;
+
+  @Field()
+  diaChiThuongTru: string;
+
+  @Field(() => [ThanhVien])
+  thanhVienMoi: ThanhVien[];
+}
+
+@ObjectType()
+export class CapNhatHoKhauOutput extends CoreOutput {}

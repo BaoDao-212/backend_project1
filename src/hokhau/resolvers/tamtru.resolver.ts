@@ -5,10 +5,16 @@ import { User } from 'src/user/entities/user.entity';
 import {
   AddTamTruInput,
   AddTamTruOutput,
-  xemThongTinTamTruOutput,
+  HetTamTruInput,
+  HetTamTruOutput,
+  SuaThongTinTamTruInput,
+  SuaThongTinTamTruOutput,
+  XemDanhSachTamTruInput,
+  XemDanhSachTamTruOutput,
+  XemThongTinTamTruOutput,
 } from '../dto/tamtru.dto';
-import { TamTru } from '../entity/tamtru.entity';
-import { TamTruService } from '../service/tamtru.service';
+import { TamTru } from '../entities/tamtru.entity';
+import { TamTruService } from '../services/tamtru.service';
 
 @Resolver(() => TamTru)
 export class TamTruResolver {
@@ -22,9 +28,30 @@ export class TamTruResolver {
   ) {
     return this.tamTruService.addTamTru(nguoiPheDuyet, input);
   }
-  @Query(() => xemThongTinTamTruOutput)
+  @Query(() => XemDanhSachTamTruOutput)
+  @Roles(['ToPho', 'ToTruong', 'KeToan'])
+  xemDanhSachTamTru(@Args('input') input: XemDanhSachTamTruInput) {
+    return this.tamTruService.xemDanhSachTamTru(input);
+  }
+  @Mutation(() => SuaThongTinTamTruOutput)
+  @Roles(['ToTruong', 'ToPho'])
+  async suaThongTinTamTru(
+    @CurrentUser() nguoiPheDuyet: User,
+    @Args('input') input: SuaThongTinTamTruInput,
+  ) {
+    return this.tamTruService.suaThongTinTamTru(nguoiPheDuyet, input);
+  }
+  @Mutation(() => HetTamTruOutput)
+  @Roles(['ToTruong', 'ToPho'])
+  async hetTamTru(
+    @CurrentUser() nguoiPheDuyet: User,
+    @Args('input') input: HetTamTruInput,
+  ) {
+    return this.tamTruService.hetTamTru(nguoiPheDuyet, input);
+  }
+  @Query(() => XemThongTinTamTruOutput)
   @Roles(['Any'])
-  xemThongTinTamTru(@CurrentUser() user: User) {
+  async xemThongTinTamTru(@CurrentUser() user: User) {
     return this.tamTruService.xemThongTinTamTru(user);
   }
 }

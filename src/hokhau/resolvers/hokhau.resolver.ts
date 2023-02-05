@@ -3,12 +3,16 @@ import { Roles } from 'src/auth/role.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import {
+  CapNhatHoKhauInput,
+  CapNhatHoKhauOutput,
   TachHoKhauInput,
   TachHoKhauOutput,
   ThemHoKhauInput,
   ThemHoKhauOutput,
   ThemNguoiVaoHoKhauInput,
   ThemNguoiVaoHoKhauOutput,
+  XemDanhSachHoKhauInput,
+  XemDanhSachHoKhauOutput,
   XemHoKhauChiTietChoQuanLiInput,
   XemHoKhauChiTietChoQuanLiOutput,
   XemLichSuThayDoiNhanKhauInput,
@@ -16,7 +20,7 @@ import {
   XoaNguoiKhoiHoKhauInput,
   XoaNguoiKhoiHoKhauOutput,
 } from '../dto/hokhau.dto';
-import { HokhauService } from '../service/hokhau.service';
+import { HokhauService } from '../services/hokhau.service';
 @Resolver()
 export class HokhauResolver {
   constructor(private readonly hoKhauService: HokhauService) {}
@@ -44,6 +48,15 @@ export class HokhauResolver {
     return this.hoKhauService.themHoKhau(nguoiPheDuyet, input);
   }
 
+  @Mutation(() => CapNhatHoKhauOutput)
+  @Roles(['ToTruong', 'ToPho'])
+  capNhatHoKhau(
+    @CurrentUser() nguoiPheDuyet: User,
+    @Args('input') input: CapNhatHoKhauInput,
+  ) {
+    return this.hoKhauService.capNhatHoKhau(nguoiPheDuyet, input);
+  }
+
   @Mutation(() => TachHoKhauOutput)
   @Roles(['ToTruong', 'ToPho'])
   tachHoKhau(
@@ -52,6 +65,7 @@ export class HokhauResolver {
   ) {
     return this.hoKhauService.tachHoKhau(nguoiPheDuyet, input);
   }
+
   @Mutation(() => ThemNguoiVaoHoKhauOutput)
   @Roles(['ToTruong', 'ToPho'])
   themNguoiVaoHoKhau(
@@ -72,9 +86,23 @@ export class HokhauResolver {
 
   @Query(() => XemLichSuThayDoiNhanKhauOutput)
   @Roles(['ToTruong', 'ToPho'])
-  xemLichSuThayDoiNhanKhau(
+  xemLichSuThayDoiNhanKhauChoQuanLy(
     @Args('input') input: XemLichSuThayDoiNhanKhauInput,
   ) {
     return this.hoKhauService.xemLichSuThayDoiNhanKhau(input);
+  }
+
+  @Query(() => XemLichSuThayDoiNhanKhauOutput)
+  @Roles(['Any'])
+  xemLichSuThayDoiNhanKhauChoNguoiDung(@CurrentUser() user: User) {
+    return this.hoKhauService.xemLichSuThayDoiNhanKhau({
+      hoKhauId: user.hoKhauId,
+    });
+  }
+
+  @Query(() => XemDanhSachHoKhauOutput)
+  @Roles(['ToTruong', 'ToPho', 'KeToan'])
+  xemDanhSachHoKhau(@Args('input') input: XemDanhSachHoKhauInput) {
+    return this.hoKhauService.xemDanhSachHoKhau(input);
   }
 }
