@@ -2,48 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type LichSuHoKhau {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  hanhDong: LoaiThayDoiHoKhau!
-  thoiGian: DateTime!
-  hoKhau: HoKhau!
-  nguoiPheDuyet: User!
-  nguoiYeuCau: User!
-  ghiChu: String
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-enum LoaiThayDoiHoKhau {
-  TaoMoiHoKhau
-  CapNhatHoKhau
-  ThemThanhVien
-  XoaThanhVien
-  ThayDoiChuHo
-  ThayDoiDiaChi
-  ThayDoiVaiTro
-  TachHoKhau
-  XoaHoKhau
-  XoaNguoiKhoiHoKhau
-  DangKyTamVang
-}
-
-type HoKhau {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  soHoKhau: String!
-  diaChiThuongTru: String!
-  ghiChu: String
-  thanhVien: [User!]!
-  lichSuHoKhau: [LichSuHoKhau!]!
-}
-
 type StoredFile {
   fileUrl: String!
   filePath: String!
@@ -53,53 +11,26 @@ type User {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  canCuocCongDan: String
   matKhau: String
   soDienThoai: String
   vaiTroNguoiDung: VaitroNguoiDung!
-  vaiTroThanhVien: VaiTroThanhVien
   daDangKi: Boolean!
   ten: String!
   gioiTinh: String!
-  biDanh: String
-  ngaySinh: DateTime!
-  noiSinh: String!
-  queQuan: String!
-  noiThuongTruTruocDo: String
-  ngayDangKiThuongTru: DateTime
-  ngheNghiep: String
-  noiLamViec: String
-  danToc: String!
   avatar: StoredFile
-  tamTru: String
   ghiChu: String
-  hoKhau: HoKhau
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 enum VaitroNguoiDung {
   Admin
-  NguoiDan
-  ToTruong
-  ToPho
-  KeToan
-}
-
-enum VaiTroThanhVien {
-  ChuHo
-  Vo
-  Chong
-  Con
-  Bo
-  Me
-  Chau
-  Chat
-  ConNuoi
-  Anh
-  Chi
-  Em
-  Ong
-  Ba
-  Khac
+  NhanVien
+  KhachHang
+  QuanLy
 }
 
 type CustomError {
@@ -134,28 +65,167 @@ type ChangePasswordOutput {
   error: CustomError
 }
 
-type TamVang {
+type MaGiamGia {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  nguoiPheDuyet: User!
-  nguoiTamVang: User!
-  ngayBatDauTamVang: DateTime
-  lyDoTamVang: String
-  diaChiNoiDen: String
-  ngayHetHieuLuc: DateTime
+  codeVoucher: String!
+  minAmount: Float!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
 }
 
-type TamTru {
+enum TypeDiscount {
+  FreeShip
+  ProductDiscount
+}
+
+type SanPham {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  nguoiPheDuyet: User!
-  nguoiTamTru: User!
-  ngayHetHanTamTru: DateTime
+  avatar: StoredFile
+  ten: String!
+  loaiSanPham: LoaiSanPham!
+  donHang: [DonHang!]!
+  trangThai: TrangThai!
+  ngayTao: DateTime!
+  soTien: Float
+  moTaSanPham: String
   ghiChu: String
-  noiTamTruHienTai: String
-  ngayHetHieuLuc: DateTime
+}
+
+enum LoaiSanPham {
+  NuocUong
+  DoNgot
+}
+
+enum TrangThai {
+  DangBan
+  NgungBan
+}
+
+type DonHang {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  nguoiMua: User!
+  sanPham: [SanPham!]!
+  soluong: [Float!]!
+  maGiamGia: MaGiamGia
+  ngayMua: DateTime
+  tongTienPhaiTra: Float!
+  ghiChu: String
+  hinhThucMua: HinhThucMua!
+}
+
+enum HinhThucMua {
+  MangVe
+  NgoiTaiQuan
+}
+
+type AddDonHangOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type XemThongTinDonHangChoQuanLiOutput {
+  ok: Boolean!
+  error: CustomError
+  DonHang: DonHang
+}
+
+type XemDanhSachDonHangOutput {
+  ok: Boolean!
+  error: CustomError
+  paginationOutput: PaginationOutput
+  DonHangs: [DonHang!]
+}
+
+type AddMaGiamGiaOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type XemThongTinMaGiamGiaOutput {
+  ok: Boolean!
+  error: CustomError
+  maGiamGia: MaGiamGia
+}
+
+type XemDanhSachMaGiamGiaOutput {
+  ok: Boolean!
+  error: CustomError
+  paginationOutput: PaginationOutput
+  maGiamGias: [MaGiamGia!]
+}
+
+type NhanVien {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  nguoiQuanLy: User!
+  nhanVien: User!
+  chiNhanh: String!
+  ngayBatDauLam: DateTime
+  MailLienHe: String!
+  canCuocCongDan: String
+  caLamViec: CaLamViec!
+  luong: Float!
+}
+
+enum CaLamViec {
+  Sang
+  Chieu
+  Toi
+}
+
+type AddNhanVienOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type EditNhanVienOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type XemThongTinNhanVienOutput {
+  ok: Boolean!
+  error: CustomError
+  nhanVien: NhanVien
+}
+
+type XemDanhSachNhanVienOutput {
+  ok: Boolean!
+  error: CustomError
+  paginationOutput: PaginationOutput
+  nhanViens: [NhanVien!]
+}
+
+type AddSanPhamOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type EditSanPhamOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type XemThongTinSanPhamOutput {
+  ok: Boolean!
+  error: CustomError
+  sanpham: SanPham
+}
+
+type XemDanhSachSanPhamOutput {
+  ok: Boolean!
+  error: CustomError
+  sanPhams: [SanPham!]
+  paginationOutput: PaginationOutput
 }
 
 type AddUserOutput {
@@ -181,194 +251,6 @@ type XemDanhSachNguoiDungOutput {
   users: [User!]
 }
 
-type ThongKeUserOuput {
-  ok: Boolean!
-  error: CustomError
-  soNguoiDangKi: Float
-  soNguoiDangKiTamTru: Float
-  soNguoiDangKiTamVang: Float
-  soHo: Float
-  soNguoiDuoiLaoDong: Float
-  soNguoiTrongLaoDong: Float
-  soNguoiTrenLaoDong: Float
-}
-
-type TachHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type ThemNguoiVaoHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type ThemHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemHoKhauChiTietChoQuanLiOutput {
-  ok: Boolean!
-  error: CustomError
-  hoKhau: HoKhau
-}
-
-type XoaNguoiKhoiHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemLichSuThayDoiNhanKhauOutput {
-  ok: Boolean!
-  error: CustomError
-  lichSuHoKhau: [LichSuHoKhau!]
-}
-
-type XemDanhSachHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-  paginationOutput: PaginationOutput
-  hoKhau: [HoKhau!]
-}
-
-type CapNhatHoKhauOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type AddTamTruOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemDanhSachTamTruOutput {
-  ok: Boolean!
-  error: CustomError
-  paginationOutput: PaginationOutput
-  tamTru: [TamTru!]
-}
-
-type SuaThongTinTamTruOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type HetTamTruOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemThongTinTamTruOutput {
-  ok: Boolean!
-  error: CustomError
-  tamTru: TamTru
-}
-
-type AddTamVangOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemDanhSachTamVangOutput {
-  ok: Boolean!
-  error: CustomError
-  paginationOutput: PaginationOutput
-  tamVang: [TamVang!]
-}
-
-type SuaThongTinTamVangOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type HetTamVangOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemThongTinTamVangOutput {
-  ok: Boolean!
-  error: CustomError
-  tamVang: TamVang
-}
-
-type KhoanPhi {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  tenKhoanPhi: String!
-  dongGop: [DongGop!]
-  loaiPhi: LoaiPhi!
-  ngayPhatDong: DateTime!
-  ngayHetHan: DateTime!
-  theoHoKhau: Boolean!
-  soTien: Float
-  ghiChu: String
-}
-
-enum LoaiPhi {
-  BatBuoc
-  UngHo
-}
-
-type DongGop {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  khoanPhi: KhoanPhi!
-  nguoiTamTru: User
-  hoKhau: HoKhau
-  trangThai: Boolean!
-  ngayNop: DateTime
-  soTienDongGop: Float!
-}
-
-type AddDongGopOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type EditDongGopOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type xemDanhSachDongGopChoNguoiQuanLiOutput {
-  ok: Boolean!
-  error: CustomError
-  paginationOutput: PaginationOutput
-  DongGop: [DongGop!]
-}
-
-type xemDanhSachDongGopChoNguoiDungOutput {
-  ok: Boolean!
-  error: CustomError
-  DongGop: [DongGop!]
-}
-
-type AddKhoanPhiOutput {
-  ok: Boolean!
-  error: CustomError
-}
-
-type XemKhoanPhiChiTietChoQuanLiOutput {
-  ok: Boolean!
-  error: CustomError
-  khoanphi: KhoanPhi
-  donggop: [DongGop!]
-  tongtien: Float!
-  nDaDong: Float!
-  nChuaDong: Float!
-}
-
-type xemDanhSachKhoanPhiChoNguoiQuanLiOutput {
-  ok: Boolean!
-  error: CustomError
-  paginationOutput: PaginationOutput
-  khoanPhi: [KhoanPhi!]
-}
-
 input StoredFileInputType {
   fileUrl: String!
   filePath: String!
@@ -378,22 +260,17 @@ type Query {
   xemThongTinNguoiDung: XemThongTinNguoiDungOutput!
   xemThongTinNguoiDungChoQuanLi(input: XemThongTinNguoiDungChoQuanLiInput!): XemThongTinNguoiDungOutput!
   xemDanhSachNguoiDung(input: XemDanhSachNguoiDungInput!): XemDanhSachNguoiDungOutput!
-  thongKeUser: ThongKeUserOuput!
   login(input: LoginInput!): LoginOutput!
   newAccessToken(input: NewAccessTokenInput!): NewAccessTokenOutput!
-  xemHoKhauChiTietChoQuanLi(input: XemHoKhauChiTietChoQuanLiInput!): XemHoKhauChiTietChoQuanLiOutput!
-  xemHoKhauChiTietChoNguoiDung: XemHoKhauChiTietChoQuanLiOutput!
-  xemLichSuThayDoiNhanKhauChoQuanLy(input: XemLichSuThayDoiNhanKhauInput!): XemLichSuThayDoiNhanKhauOutput!
-  xemLichSuThayDoiNhanKhauChoNguoiDung: XemLichSuThayDoiNhanKhauOutput!
-  xemDanhSachHoKhau(input: XemDanhSachHoKhauInput!): XemDanhSachHoKhauOutput!
-  xemDanhSachTamTru(input: XemDanhSachTamTruInput!): XemDanhSachTamTruOutput!
-  xemThongTinTamTru: XemThongTinTamTruOutput!
-  xemDanhSachTamVang(input: XemDanhSachTamVangInput!): XemDanhSachTamVangOutput!
-  xemThongTinTamVang: XemThongTinTamVangOutput!
-  xemKhoanPhiChiTietChoNguoiQuanLi(input: XemKhoanPhiChiTietChoQuanLiInput!): XemKhoanPhiChiTietChoQuanLiOutput!
-  XemDanhSachKhoanPhiChoNguoiQuanLi(input: xemDanhSachKhoanPhiChoNguoiQuanLiInput!): xemDanhSachKhoanPhiChoNguoiQuanLiOutput!
-  xemDanhSachDongGopChoNguoiQuanLi(input: xemDanhSachDongGopChoNguoiQuanLiInput!): xemDanhSachDongGopChoNguoiQuanLiOutput!
-  xemDanhSachDongGopChoNguoiDung: xemDanhSachDongGopChoNguoiDungOutput!
+  xemThongTinSanPham(input: XemThongTinSanPhamInput!): XemThongTinSanPhamOutput!
+  xemDanhSachSanPham(input: XemDanhSachSanPhamInput!): XemDanhSachSanPhamOutput!
+  xemThongTinNhanVien: XemThongTinNhanVienOutput!
+  xemThongTinNhanVienChoQuanLi(input: XemThongTinNhanVienChoQuanLiInput!): XemThongTinNhanVienOutput!
+  xemDanhSachNhanVien(input: XemDanhSachNhanVienInput!): XemDanhSachNhanVienOutput!
+  xemThongTinDonHangChoQuanLi(input: XemThongTinDonHangChoQuanLiInput!): XemThongTinDonHangChoQuanLiOutput!
+  xemDanhSachDonHang(input: XemDanhSachDonHangInput!): XemDanhSachDonHangOutput!
+  xemThongTinMaGiamGiaChoQuanLi(input: XemThongTinMaGiamGiaChoQuanLiInput!): XemThongTinMaGiamGiaOutput!
+  xemDanhSachMaGiamGia(input: XemDanhSachMaGiamGiaInput!): XemDanhSachMaGiamGiaOutput!
 }
 
 input XemThongTinNguoiDungChoQuanLiInput {
@@ -403,7 +280,7 @@ input XemThongTinNguoiDungChoQuanLiInput {
 input XemDanhSachNguoiDungInput {
   paginationInput: PaginationInput!
   hoTen: String
-  canCuocCongDan: String
+  soDienThoai: String
 }
 
 input PaginationInput {
@@ -412,7 +289,7 @@ input PaginationInput {
 }
 
 input LoginInput {
-  canCuocCongDan: String
+  soDienThoai: String
   matKhau: String!
 }
 
@@ -420,47 +297,41 @@ input NewAccessTokenInput {
   accessToken: String!
 }
 
-input XemHoKhauChiTietChoQuanLiInput {
-  hoKhauId: ID!
+input XemThongTinSanPhamInput {
+  SanPhamId: ID!
 }
 
-input XemLichSuThayDoiNhanKhauInput {
-  hoKhauId: ID!
-}
-
-input XemDanhSachHoKhauInput {
+input XemDanhSachSanPhamInput {
   paginationInput: PaginationInput!
-  soHoKhau: String
+  tenSanPham: String
 }
 
-input XemDanhSachTamTruInput {
-  paginationInput: PaginationInput!
-  canCuocCongDan: String
+input XemThongTinNhanVienChoQuanLiInput {
+  NhanVienId: ID!
 }
 
-input XemDanhSachTamVangInput {
+input XemDanhSachNhanVienInput {
   paginationInput: PaginationInput!
   canCuocCongDan: String
+  soDienThoai: String
 }
 
-input XemKhoanPhiChiTietChoQuanLiInput {
-  khoanPhiId: Float!
+input XemThongTinDonHangChoQuanLiInput {
+  DonHangId: ID!
 }
 
-input xemDanhSachKhoanPhiChoNguoiQuanLiInput {
+input XemDanhSachDonHangInput {
   paginationInput: PaginationInput!
-  tenKhoanPhi: String
-  loaiPhi: LoaiPhi
-  theoHoKhau: Boolean
+  ngayMua: DateTime
 }
 
-input xemDanhSachDongGopChoNguoiQuanLiInput {
+input XemThongTinMaGiamGiaChoQuanLiInput {
+  maGiamGiaId: ID!
+}
+
+input XemDanhSachMaGiamGiaInput {
   paginationInput: PaginationInput!
-  tenKhoanPhi: String
-  sohoKhau: Float
-  canCuocCongDan: String
-  loaiPhi: LoaiPhi
-  trangThai: Boolean
+  codeVoucher: String
 }
 
 type Mutation {
@@ -468,60 +339,35 @@ type Mutation {
   editUser(input: EditUserInput!): EditUserOutput!
   registerUser(input: RegisterUserInput!): RegisterUserOutput!
   changePassword(input: ChangePasswordInput!): ChangePasswordOutput!
-  themHoKhau(input: ThemHoKhauInput!): ThemHoKhauOutput!
-  capNhatHoKhau(input: CapNhatHoKhauInput!): CapNhatHoKhauOutput!
-  tachHoKhau(input: TachHoKhauInput!): TachHoKhauOutput!
-  themNguoiVaoHoKhau(input: ThemNguoiVaoHoKhauInput!): ThemNguoiVaoHoKhauOutput!
-  xoaNguoiKhoiHoKhau(input: XoaNguoiKhoiHoKhauInput!): XoaNguoiKhoiHoKhauOutput!
-  addTamTru(input: AddTamTruInput!): AddTamTruOutput!
-  suaThongTinTamTru(input: SuaThongTinTamTruInput!): SuaThongTinTamTruOutput!
-  hetTamTru(input: HetTamTruInput!): HetTamTruOutput!
-  addTamVang(input: AddTamVangInput!): AddTamVangOutput!
-  suaThongTinTamVang(input: SuaThongTinTamVangInput!): SuaThongTinTamVangOutput!
-  hetTamVang(input: HetTamVangInput!): HetTamVangOutput!
-  addKhoanPhi(input: AddKhoanPhiInput!): AddKhoanPhiOutput!
-  addDongGop(input: AddDongGopInput!): AddDongGopOutput!
-  EditDongGop(input: EditDongGopInput!): EditDongGopOutput!
+  addSanPham(input: AddSanPhamInput!): AddSanPhamOutput!
+  editSanPham(input: EditSanPhamInput!): EditSanPhamOutput!
+  addNhanVien(input: AddNhanVienInput!): AddNhanVienOutput!
+  editNhanVien(input: EditNhanVienInput!): EditNhanVienOutput!
+  addDonHang(input: AddDonHangInput!): AddDonHangOutput!
+  addMaGiamGia(input: AddMaGiamGiaInput!): AddMaGiamGiaOutput!
 }
 
 input AddUserInput {
-  canCuocCongDan: String
   soDienThoai: String
   ten: String!
   gioiTinh: String!
-  biDanh: String
-  ngaySinh: DateTime!
-  noiSinh: String!
-  queQuan: String!
-  noiThuongTruTruocDo: String
-  ngheNghiep: String
-  noiLamViec: String
-  danToc: String!
   avatar: StoredFileInputType
   ghiChu: String
 }
 
 input EditUserInput {
   soDienThoai: String
+  daDangKi: Boolean
   ten: String
   gioiTinh: String
-  biDanh: String
-  ngaySinh: DateTime
-  noiSinh: String
-  queQuan: String
-  noiThuongTruTruocDo: String
-  ngayDangKiThuongTru: DateTime
-  ngheNghiep: String
-  noiLamViec: String
-  danToc: String
   avatar: StoredFileInputType
   ghiChu: String
-  nguoiYeuCauId: ID!
+  nguoiCanEditId: ID!
 }
 
 input RegisterUserInput {
-  canCuocCongDan: String
   matKhau: String
+  soDienThoai: String
   matKhauLapLai: String!
 }
 
@@ -531,91 +377,67 @@ input ChangePasswordInput {
   matKhauMoiLapLai: String!
 }
 
-input ThemHoKhauInput {
-  nguoiYeuCauId: ID!
-  diaChiThuongTru: String!
-  thanhVien: [ThanhVien!]!
-}
-
-input ThanhVien {
-  id: ID!
-  vaiTroThanhVien: VaiTroThanhVien!
-}
-
-input CapNhatHoKhauInput {
-  hoKhauId: ID!
-  nguoiYeuCauId: ID!
-  diaChiThuongTru: String!
-  thanhVienMoi: [ThanhVien!]!
-}
-
-input TachHoKhauInput {
-  nguoiYeuCauId: ID!
-  hoKhauId: ID!
-  thanhVienHoKhauMoi: [ThanhVien!]!
-  diaChiThuongTruMoi: String!
-}
-
-input ThemNguoiVaoHoKhauInput {
-  nguoiYeuCauId: ID!
-  nguoiMoi: ThanhVien!
-  hoKhauId: ID!
-}
-
-input XoaNguoiKhoiHoKhauInput {
-  nguoiYeuCauId: ID!
-  nguoiCanXoaId: ID!
-  hoKhauId: ID!
-}
-
-input AddTamTruInput {
-  nguoiTamTruId: ID!
-  noiTamTruHienTai: String!
-}
-
-input SuaThongTinTamTruInput {
-  nguoiYeuCauId: ID!
-  noiTamTruMoi: String!
-}
-
-input HetTamTruInput {
-  nguoiYeuCauId: ID!
-}
-
-input AddTamVangInput {
-  nguoiTamVangId: ID!
-  lyDoTamVang: String!
-  diaChiNoiDen: String!
-}
-
-input SuaThongTinTamVangInput {
-  nguoiYeuCauId: ID!
-  lyDoTamVang: String!
-  diaChiNoiDenMoi: String!
-}
-
-input HetTamVangInput {
-  nguoiYeuCauId: ID!
-}
-
-input AddKhoanPhiInput {
-  tenKhoanPhi: String!
-  loaiPhi: LoaiPhi!
-  ngayPhatDong: DateTime!
-  ngayHetHan: DateTime!
-  theoHoKhau: Boolean!
+input AddSanPhamInput {
+  avatar: StoredFileInputType
+  ten: String!
+  loaiSanPham: LoaiSanPham!
   soTien: Float
+  moTaSanPham: String
 }
 
-input AddDongGopInput {
-  KhoanPhiId: Float!
-  soTienDongGop: Float!
-  nguoiTamTruId: Float
-  hoKhauId: Float
+input EditSanPhamInput {
+  avatar: StoredFileInputType
+  ten: String
+  loaiSanPham: LoaiSanPham
+  trangThai: TrangThai
+  soTien: Float
+  moTaSanPham: String
+  sanPhamId: ID!
 }
 
-input EditDongGopInput {
-  dongGopId: Float!
-  soTienDongGop: Float!
-  ngayNop: DateTime!
+input AddNhanVienInput {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  chiNhanh: String!
+  ngayBatDauLam: DateTime
+  MailLienHe: String!
+  canCuocCongDan: String
+  caLamViec: CaLamViec!
+  luong: Float!
+}
+
+input EditNhanVienInput {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  chiNhanh: String
+  ngayBatDauLam: DateTime
+  MailLienHe: String
+  canCuocCongDan: String
+  caLamViec: CaLamViec
+  luong: Float
+  nguoiEditId: ID!
+}
+
+input AddDonHangInput {
+  hinhThucMua: HinhThucMua!
+  diaChi: String!
+  codeVoucher: String
+  sanPham: [Order!]!
+  PhiShip: Float!
+}
+
+input Order {
+  sanPhamId: ID!
+  numberSanPham: Float!
+}
+
+input AddMaGiamGiaInput {
+  codeVoucher: String!
+  minAmount: Float!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
 }

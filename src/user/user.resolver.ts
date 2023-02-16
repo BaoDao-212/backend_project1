@@ -10,7 +10,6 @@ import {
   XemDanhSachNguoiDungOutput,
   XemThongTinNguoiDungChoQuanLiInput,
   XemThongTinNguoiDungOutput,
-  ThongKeUserOuput,
 } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -20,7 +19,7 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Mutation(() => AddUserOutput)
-  @Roles(['ToTruong', 'ToPho'])
+  @Roles(['Admin', 'QuanLy'])
   addUser(@Args('input') input: AddUserInput) {
     return this.userService.addUser(input);
   }
@@ -32,7 +31,7 @@ export class UserResolver {
   }
 
   @Query(() => XemThongTinNguoiDungOutput)
-  @Roles(['ToTruong', 'ToPho'])
+  @Roles(['Admin', 'QuanLy'])
   xemThongTinNguoiDungChoQuanLi(
     @Args('input') input: XemThongTinNguoiDungChoQuanLiInput,
   ) {
@@ -40,20 +39,14 @@ export class UserResolver {
   }
 
   @Mutation(() => EditUserOutput)
-  @Roles(['ToTruong', 'ToPho'])
+  @Roles(['Admin', 'QuanLy'])
   editUser(@Args('input') input: EditUserInput) {
     return this.userService.editUser(input);
   }
 
   @Query(() => XemDanhSachNguoiDungOutput)
-  @Roles(['ToTruong', 'ToPho'])
+  @Roles(['Admin', 'QuanLy'])
   xemDanhSachNguoiDung(@Args('input') input: XemDanhSachNguoiDungInput) {
     return this.userService.xemDanhSachNguoiDung(input);
-  }
-
-  @Query(() => ThongKeUserOuput)
-  @Roles(['ToTruong', 'ToPho'])
-  thongKeUser() {
-    return this.userService.thongKeUser();
   }
 }

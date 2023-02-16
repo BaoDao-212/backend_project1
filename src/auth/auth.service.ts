@@ -29,7 +29,7 @@ export class AuthService {
 
   // TODO: thêm kiểm tra opt gửi về điện thoại
   async registerUser({
-    canCuocCongDan,
+    soDienThoai,
     matKhau,
     matKhauLapLai,
   }: RegisterUserInput): Promise<RegisterUserOutput> {
@@ -38,7 +38,7 @@ export class AuthService {
         return createError('Input', 'Mật khẩu lặp lại không khớp');
       const user = await this.userRepo.findOne({
         where: {
-          canCuocCongDan,
+          soDienThoai,
         },
       });
       if (!user)
@@ -56,21 +56,16 @@ export class AuthService {
     }
   }
 
-  async login({ canCuocCongDan, matKhau }: LoginInput): Promise<LoginOutput> {
+  async login({ soDienThoai, matKhau }: LoginInput): Promise<LoginOutput> {
     try {
       const user = await this.userRepo.findOne({
         where: {
-          canCuocCongDan,
+          soDienThoai,
         },
         select: ['id', 'matKhau', 'daDangKi'],
       });
-      if (!user)
-        return createError('Input', 'Số căn cước công dân không phù hợp');
-      if (!user.daDangKi)
-        return createError(
-          'Input',
-          'Số căn cước công dân chưa được đăng kí tài khoản',
-        );
+      // if (!user)
+      //   return createError('Input', 'Số điện thoại không phù hợp');
       if (!(await user.checkPassword(matKhau)))
         return createError('Input', 'Mật khẩu không đúng');
       const accessToken = sign(

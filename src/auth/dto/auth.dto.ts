@@ -4,7 +4,7 @@ import { User } from 'src/user/entities/user.entity';
 
 @InputType()
 export class RegisterUserInput extends PickType(User, [
-  'canCuocCongDan',
+  'soDienThoai',
   'matKhau',
 ]) {
   @Field()
@@ -15,7 +15,7 @@ export class RegisterUserInput extends PickType(User, [
 export class RegisterUserOutput extends CoreOutput {}
 
 @InputType()
-export class LoginInput extends PickType(User, ['canCuocCongDan']) {
+export class LoginInput extends PickType(User, ['soDienThoai']) {
   @Field()
   matKhau: string;
 }

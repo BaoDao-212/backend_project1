@@ -1,6 +1,3 @@
-import { HoKhau } from './../hokhau/entities/hokhau.entity';
-import { TamVang } from './../hokhau/entities/tamvang.entity';
-import { TamTru } from './../hokhau/entities/tamtru.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { omitBy } from 'lodash';
@@ -16,7 +13,6 @@ import {
   XemDanhSachNguoiDungOutput,
   XemThongTinNguoiDungChoQuanLiInput,
   XemThongTinNguoiDungOutput,
-  ThongKeUserOuput,
 } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
@@ -25,10 +21,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-    @InjectRepository(TamTru) private readonly tamTruRepo: Repository<TamTru>,
-    @InjectRepository(TamVang)
-    private readonly tamVangRepo: Repository<TamVang>,
-    @InjectRepository(HoKhau) private readonly hoKhauRepo: Repository<HoKhau>,
   ) {}
 
   // quản lí thêm người dùng
@@ -36,7 +28,7 @@ export class UserService {
     try {
       const user = await this.userRepo.findOne({
         where: {
-          canCuocCongDan: input.canCuocCongDan,
+          soDienThoai: input.soDienThoai,
         },
       });
       if (user) return createError('Input', 'Đã tồn tại căn cước công dân này');
@@ -86,19 +78,19 @@ export class UserService {
   }
   async editUser(input: EditUserInput): Promise<EditUserOutput> {
     try {
-      const { nguoiYeuCauId } = input;
-      const nguoiYeuCau = await this.userRepo.findOne({
+      const { nguoiCanEditId } = input;
+      const nguoiCanEdit = await this.userRepo.findOne({
         where: {
-          id: nguoiYeuCauId,
+          id: nguoiCanEditId,
         },
       });
-      if (!nguoiYeuCau)
+      if (!nguoiCanEdit)
         return createError('Input', 'Người yêu cầu không hợp lệ');
 
       // ghi đè các trường input không bị null hoặc undefined vào trong nguoiYeuCau
 
       const updateUser = {
-        ...nguoiYeuCau,
+        ...nguoiCanEdit,
         ...omitBy(input, (v) => v == null || v == undefined),
       };
       this.userRepo.save(updateUser);
@@ -118,14 +110,12 @@ export class UserService {
       const {
         paginationInput: { page, resultsPerPage },
         hoTen,
-        canCuocCongDan,
+        soDienThoai,
       } = input;
       const [users, totalResults] = await this.userRepo.findAndCount({
         where: {
           ten: hoTen ? ILike(`%${hoTen}%`) : undefined,
-          canCuocCongDan: canCuocCongDan
-            ? ILike(`%${canCuocCongDan}%`)
-            : undefined,
+          soDienThoai: soDienThoai ? ILike(`%${soDienThoai}%`) : undefined,
         },
         skip: (page - 1) * resultsPerPage, // bỏ qua bao nhiêu bản ghi
         take: resultsPerPage, // lấy bao nhiêu bản ghi
@@ -140,74 +130,6 @@ export class UserService {
           totalResults,
           totalPages: Math.ceil(totalResults / resultsPerPage),
         },
-      };
-    } catch (error) {
-      return createError('Server', 'Lỗi server, thử lại sau');
-    }
-  }
-
-  async thongKeUser(): Promise<ThongKeUserOuput> {
-    try {
-      const numberOfUser = await this.userRepo.count();
-      const numberOfUserTamTru = await this.tamTruRepo.count({
-        where: {
-          ngayHetHieuLuc: IsNull(),
-        },
-      });
-      const numberOfUserTamVang = await this.tamVangRepo.count({
-        where: {
-          ngayHetHieuLuc: IsNull(),
-        },
-      });
-      const soHo = await this.hoKhauRepo.count();
-
-      const now = new Date();
-      const check15 = new Date(
-        now.getFullYear() - 15,
-        now.getMonth(),
-        now.getDate(),
-      );
-      const check60 = new Date(
-        now.getFullYear() - 60,
-        now.getMonth(),
-        now.getDate(),
-      );
-      const check62 = new Date(
-        now.getFullYear() - 62,
-        now.getMonth(),
-        now.getDate(),
-      );
-      const soNguoiDuoiLaoDong = await this.userRepo.count({
-        where: {
-          ngaySinh: MoreThan(check15),
-        },
-      });
-      const soNguoiNgoaiLaoDongNu = await this.userRepo.count({
-        where: {
-          ngaySinh: LessThan(check60),
-          gioiTinh: 'Nữ',
-        },
-      });
-
-      const soNguoiNgoaiLaoDongNam = await this.userRepo.count({
-        where: {
-          ngaySinh: LessThan(check62),
-          gioiTinh: 'Nam',
-        },
-      });
-
-      const soNguoiNgoaiLaoDong =
-        soNguoiNgoaiLaoDongNam + soNguoiNgoaiLaoDongNu;
-      return {
-        ok: true,
-        soNguoiDangKi: numberOfUser,
-        soNguoiDangKiTamTru: numberOfUserTamTru,
-        soNguoiDangKiTamVang: numberOfUserTamVang,
-        soHo: soHo,
-        soNguoiDuoiLaoDong: soNguoiDuoiLaoDong,
-        soNguoiTrongLaoDong:
-          numberOfUser - soNguoiDuoiLaoDong - soNguoiNgoaiLaoDong,
-        soNguoiTrenLaoDong: soNguoiNgoaiLaoDong,
       };
     } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');

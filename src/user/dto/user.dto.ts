@@ -22,11 +22,7 @@ export class AddUserInput extends OmitType(User, [
   'hashPassword',
   'matKhau',
   'vaiTroNguoiDung',
-  'vaiTroThanhVien',
   'daDangKi',
-  'hoKhau',
-  'tamTru',
-  'ngayDangKiThuongTru',
 ]) {}
 
 @ObjectType()
@@ -41,17 +37,11 @@ export class EditUserInput extends PartialType(
     'hashPassword',
     'matKhau',
     'vaiTroNguoiDung',
-    'canCuocCongDan',
-    'daDangKi',
-    'hoKhau',
-    'hoKhauId',
-    'tamTru',
     'id',
-    'vaiTroThanhVien',
   ]),
 ) {
   @Field(() => ID)
-  nguoiYeuCauId: number;
+  nguoiCanEditId: number;
 }
 
 @ObjectType()
@@ -78,7 +68,7 @@ export class XemDanhSachNguoiDungInput {
   hoTen?: string;
 
   @Field({ nullable: true })
-  canCuocCongDan?: string;
+  soDienThoai?: string;
 }
 
 @ObjectType()

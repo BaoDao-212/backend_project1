@@ -11,19 +11,18 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ACCESS_TOKEN } from './common/constants/constants';
 import { DataModule } from './data/data.module';
+import { DonHangModule } from './donhang/donhang.module';
+import { DonHang } from './donhang/entities/donhang.entity';
 import { FirebaseModule } from './firebase/firebase.module';
+import { MaGiamGia } from './donhang/entities/magiamgia.entity';
+import { NhanVien } from './nhanvien/entities/nhanvien.entity';
+import { NhanVienModule } from './nhanvien/nhanvien.module';
+import { SanPham } from './sanpham/entities/sanpham.entity';
+import { SanPhamModule } from './sanpham/sanpham.module';
 import { SMSModule } from './sms/sms.module';
+import { UploadModule } from './upload/upload.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
-import { HokhauModule } from './hokhau/hokhau.module';
-import { HoKhau } from './hokhau/entities/hokhau.entity';
-import { LichSuHoKhau } from './hokhau/entities/lichsuhokhau.entity';
-import { DongGop } from './khoanphi/entities/donggop.entity';
-import { KhoanPhi } from './khoanphi/entities/khoanphi.entity';
-import { KhoanPhiModule } from './khoanphi/khoanphi.module';
-import { TamTru } from './hokhau/entities/tamtru.entity';
-import { TamVang } from './hokhau/entities/tamvang.entity';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,11 +40,11 @@ import { TamVang } from './hokhau/entities/tamvang.entity';
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
-        // FIREBASE_API_KEY: Joi.string().required(),
-        // FIREBASE_AUTH_DOMAIN: Joi.string().required(),
-        // FIREBASE_PROJECT_ID: Joi.string().required(),
-        // FIREBASE_STORAGE_BUCKET: Joi.string().required(),
-        // FIREBASE_APP_ID: Joi.string().required(),
+        FIREBASE_API_KEY: Joi.string().required(),
+        FIREBASE_AUTH_DOMAIN: Joi.string().required(),
+        FIREBASE_PROJECT_ID: Joi.string().required(),
+        FIREBASE_STORAGE_BUCKET: Joi.string().required(),
+        FIREBASE_APP_ID: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -89,15 +88,7 @@ import { TamVang } from './hokhau/entities/tamvang.entity';
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_NAME,
           }),
-      entities: [
-        User,
-        HoKhau,
-        LichSuHoKhau,
-        DongGop,
-        KhoanPhi,
-        TamTru,
-        TamVang,
-      ],
+      entities: [User, SanPham, NhanVien, MaGiamGia, DonHang],
       synchronize: true,
       ...(process.env.NODE_ENV === 'production'
         ? {
@@ -113,15 +104,13 @@ import { TamVang } from './hokhau/entities/tamvang.entity';
     }),
     UserModule,
     AuthModule,
+    UploadModule,
     DataModule,
-    HokhauModule,
-    KhoanPhiModule,
+    SanPhamModule,
+    NhanVienModule,
+    DonHangModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor() {
-    console.log(process.env);
-  }
-}
+export class AppModule {}

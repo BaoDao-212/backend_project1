@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { range, sample, sampleSize } from 'lodash';
-import { User } from 'src/user/entities/user.entity';
+import { User, VaitroNguoiDung } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 
 const alphabetLetters = range(26)
@@ -119,29 +119,12 @@ export class DataService {
       return this.userRepo.save(
         this.userRepo.create({
           ten: `${sample(ho)} ${sample(tenDem)} ${sample(ten)}`,
-          biDanh: `Bi danh ${sampleSize(alphabetLetters, 4).join('')}`,
-          canCuocCongDan: `034${sampleSize(range(0, 10), 9).join('')}`,
-          ngheNghiep: sample(ngheNghiep),
-          danToc: 'Kinh',
           daDangKi: false,
-          noiSinh: temp,
-          queQuan: temp,
-          noiThuongTruTruocDo: `${sampleSize(
-            alphabetLetters,
-            sample([4, 5, 6]),
-          ).join('')}, ${sampleSize(alphabetLetters, sample([4, 5, 6])).join(
-            '',
-          )}, ${sample(noiSinh)}`,
           soDienThoai: `${sample(dauSoDT)}${sampleSize(range(0, 10), 7).join(
             '',
           )}`,
-          ngaySinh: new Date(
-            new Date(
-              start.getTime() +
-                Math.random() * (end.getTime() - start.getTime()),
-            ).setHours(0, 0, 0, 0),
-          ),
           gioiTinh: sample(['Nam', 'Nữ']),
+          vaiTroNguoiDung: VaitroNguoiDung.KhachHang,
         }),
       );
     });

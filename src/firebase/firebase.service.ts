@@ -43,6 +43,7 @@ export class FirebaseService {
       const storageRef = ref(this.storage, `${storagePath}/${storageName}`);
       const result = await uploadBytes(storageRef, buffer, metatdata);
       const fileUrl = await getDownloadURL(result.ref);
+      console.log(fileUrl);
       return {
         fileReference: {
           fileUrl,
@@ -63,6 +64,7 @@ export class FirebaseService {
       const fileReferences = results.map(
         ({ fileReference: { filePath, fileUrl } }) => ({ fileUrl, filePath }),
       );
+
       return {
         fileReferences,
       };
