@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { omitBy } from 'lodash';
 import { SortOrder } from 'src/common/entities/core.entity';
 import { createError } from 'src/common/utils/createError';
+import { User, VaitroNguoiDung } from 'src/user/entities/user.entity';
 import { ILike, Repository } from 'typeorm';
 import {
   AddNhanVienInput,
@@ -21,6 +22,8 @@ export class NhanVienService {
   constructor(
     @InjectRepository(NhanVien)
     private readonly NhanVienRepo: Repository<NhanVien>,
+    @InjectRepository(User)
+    private readonly UserRepo: Repository<User>,
   ) {}
 
   // quản lí thêm người dùng
@@ -32,8 +35,34 @@ export class NhanVienService {
         },
       });
       if (NhanVien) return createError('Input', 'Đã tồn tại nhân viên này');
-      await this.NhanVienRepo.save(this.NhanVienRepo.create({ ...input }));
+      const nvUser = await this.UserRepo.findOne({
+        where: {
+          soDienThoai: input.soDienThoai,
+        },
+      });
+      if (nvUser)
+        return createError('Input', 'Số điện thoại của người này đã tồn tại');
+      const nhanVienUser = await this.UserRepo.create({
+        soDienThoai: input.soDienThoai,
+        vaiTroNguoiDung: VaitroNguoiDung.NhanVien,
+        ten: input.ten,
+        gioiTinh: input.gioiTinh,
+        daDangKi: true,
+        matKhau: 'password',
+      });
+      await this.UserRepo.save(nhanVienUser);
+      await this.NhanVienRepo.save(
+        this.NhanVienRepo.create({
+          caLamViec: input.caLamViec,
+          canCuocCongDan: input.canCuocCongDan,
+          chiNhanh: input.chiNhanh,
+          MailLienHe: input.MailLienHe,
+          luong: input.luong,
+          nhanVien: nhanVienUser,
+        }),
+      );
     } catch (error) {
+      console.log(error);
       return createError('Server', 'Lỗi server, thử lại sau');
     }
     return {
@@ -109,6 +138,9 @@ export class NhanVienService {
           nhanVien: {
             soDienThoai: soDienThoai ? ILike(`%${soDienThoai}%`) : undefined,
           },
+        },
+        relations: {
+          nhanVien: true,
         },
         skip: (page - 1) * resultsPerPage, // bỏ qua bao nhiêu bản ghi
         take: resultsPerPage, // lấy bao nhiêu bản ghi

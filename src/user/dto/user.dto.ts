@@ -11,6 +11,7 @@ import {
   PaginationInput,
   PaginationOutput,
 } from 'src/common/dto/output.dto';
+import { SanPham } from 'src/sanpham/entities/sanpham.entity';
 import { User } from '../entities/user.entity';
 
 @InputType()
@@ -81,25 +82,31 @@ export class XemDanhSachNguoiDungOutput extends CoreOutput {
 }
 
 @ObjectType()
-export class ThongKeUserOuput extends CoreOutput {
+export class ThongKeOuput extends CoreOutput {
   @Field(() => Number, { nullable: true })
   soNguoiDangKi?: number;
 
   @Field(() => Number, { nullable: true })
-  soNguoiDangKiTamTru?: number;
+  soDonHang?: number;
 
   @Field(() => Number, { nullable: true })
-  soNguoiDangKiTamVang?: number;
+  soDonHangThangNay?: number;
 
   @Field(() => Number, { nullable: true })
-  soHo?: number;
+  soNhanVien?: number;
 
   @Field(() => Number, { nullable: true })
-  soNguoiDuoiLaoDong?: number;
+  soSanPham?: number;
 
   @Field(() => Number, { nullable: true })
-  soNguoiTrongLaoDong?: number;
+  doanhThuTrongThang?: number;
 
   @Field(() => Number, { nullable: true })
-  soNguoiTrenLaoDong?: number;
+  doanhThu?: number;
+
+  @Field(() => SanPham, { nullable: true })
+  sanPhamBanChay?: SanPham[];
+
+  @Field(() => Number, { nullable: true })
+  tienLuongCuaTatCaNhanVien?: number;
 }

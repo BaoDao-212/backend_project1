@@ -41,8 +41,7 @@ export class AuthService {
           soDienThoai,
         },
       });
-      if (!user)
-        return createError('Input', 'Số căn cước công dân không phù hợp');
+      if (!user) return createError('Input', 'Số số điện thoại không phù hợp');
       if (user.daDangKi)
         return createError('Input', 'Tài khoản đã được đăng kí');
       user.matKhau = matKhau;

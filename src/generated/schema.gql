@@ -2,6 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type MaGiamGia {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  codeVoucher: String!
+  minAmount: Float!
+  user: User!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum TypeDiscount {
+  FreeShip
+  ProductDiscount
+}
+
 type StoredFile {
   fileUrl: String!
   filePath: String!
@@ -18,13 +41,9 @@ type User {
   ten: String!
   gioiTinh: String!
   avatar: StoredFile
+  maGiamGia: [MaGiamGia!]
   ghiChu: String
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 enum VaitroNguoiDung {
   Admin
@@ -63,23 +82,6 @@ type NewAccessTokenOutput {
 type ChangePasswordOutput {
   ok: Boolean!
   error: CustomError
-}
-
-type MaGiamGia {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  codeVoucher: String!
-  minAmount: Float!
-  voucherAmount: Float!
-  startDate: DateTime!
-  endDate: DateTime!
-  typeDiscount: TypeDiscount!
-}
-
-enum TypeDiscount {
-  FreeShip
-  ProductDiscount
 }
 
 type SanPham {
@@ -166,7 +168,6 @@ type NhanVien {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  nguoiQuanLy: User!
   nhanVien: User!
   chiNhanh: String!
   ngayBatDauLam: DateTime
@@ -352,6 +353,29 @@ input AddUserInput {
   ten: String!
   gioiTinh: String!
   avatar: StoredFileInputType
+  maGiamGia: [MaGiamGiaInputType!]
+  ghiChu: String
+}
+
+input MaGiamGiaInputType {
+  codeVoucher: String!
+  minAmount: Float!
+  user: UserInputType!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
+}
+
+input UserInputType {
+  matKhau: String
+  soDienThoai: String
+  vaiTroNguoiDung: VaitroNguoiDung!
+  daDangKi: Boolean!
+  ten: String!
+  gioiTinh: String!
+  avatar: StoredFileInputType
+  maGiamGia: [MaGiamGiaInputType!]
   ghiChu: String
 }
 
@@ -361,6 +385,7 @@ input EditUserInput {
   ten: String
   gioiTinh: String
   avatar: StoredFileInputType
+  maGiamGia: [MaGiamGiaInputType!]
   ghiChu: String
   nguoiCanEditId: ID!
 }
@@ -396,15 +421,15 @@ input EditSanPhamInput {
 }
 
 input AddNhanVienInput {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
   chiNhanh: String!
   ngayBatDauLam: DateTime
   MailLienHe: String!
   canCuocCongDan: String
   caLamViec: CaLamViec!
   luong: Float!
+  soDienThoai: String!
+  ten: String!
+  gioiTinh: String!
 }
 
 input EditNhanVienInput {
@@ -436,6 +461,7 @@ input Order {
 input AddMaGiamGiaInput {
   codeVoucher: String!
   minAmount: Float!
+  user: UserInputType!
   voucherAmount: Float!
   startDate: DateTime!
   endDate: DateTime!
