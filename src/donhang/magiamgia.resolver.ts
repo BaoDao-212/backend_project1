@@ -30,7 +30,7 @@ export class MaGiamGiaResolver {
   }
 
   @Query(() => XemDanhSachMaGiamGiaOutput)
-  @Roles(['QuanLy'])
+  @Roles(['NhanVien', 'QuanLy'])
   xemDanhSachMaGiamGia(@Args('input') input: XemDanhSachMaGiamGiaInput) {
     return this.MaGiamGiaService.xemDanhSachMaGiamGia(input);
   }

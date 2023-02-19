@@ -18,6 +18,7 @@ type User {
   ten: String!
   gioiTinh: String!
   avatar: StoredFile
+  maGiamGia: [MaGiamGia!]
   ghiChu: String
 }
 
@@ -31,6 +32,24 @@ enum VaitroNguoiDung {
   NhanVien
   KhachHang
   QuanLy
+}
+
+type MaGiamGia {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  codeVoucher: String!
+  minAmount: Float!
+  user: User!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
+}
+
+enum TypeDiscount {
+  FreeShip
+  ProductDiscount
 }
 
 type CustomError {
@@ -63,23 +82,6 @@ type NewAccessTokenOutput {
 type ChangePasswordOutput {
   ok: Boolean!
   error: CustomError
-}
-
-type MaGiamGia {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  codeVoucher: String!
-  minAmount: Float!
-  voucherAmount: Float!
-  startDate: DateTime!
-  endDate: DateTime!
-  typeDiscount: TypeDiscount!
-}
-
-enum TypeDiscount {
-  FreeShip
-  ProductDiscount
 }
 
 type SanPham {
@@ -119,6 +121,7 @@ type DonHang {
   tongTienPhaiTra: Float!
   ghiChu: String
   hinhThucMua: HinhThucMua!
+  trangThaiDonHang: TrangThaiDonHang!
 }
 
 enum HinhThucMua {
@@ -126,7 +129,17 @@ enum HinhThucMua {
   NgoiTaiQuan
 }
 
+enum TrangThaiDonHang {
+  Oke
+  ChoPheDuyet
+}
+
 type AddDonHangOutput {
+  ok: Boolean!
+  error: CustomError
+}
+
+type EditDonHangOutput {
   ok: Boolean!
   error: CustomError
 }
@@ -166,7 +179,6 @@ type NhanVien {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  nguoiQuanLy: User!
   nhanVien: User!
   chiNhanh: String!
   ngayBatDauLam: DateTime
@@ -242,6 +254,8 @@ type XemThongTinNguoiDungOutput {
   ok: Boolean!
   error: CustomError
   user: User
+  soLuongDonHang: Float!
+  tongTienDaMua: Float!
 }
 
 type XemDanhSachNguoiDungOutput {
@@ -249,6 +263,18 @@ type XemDanhSachNguoiDungOutput {
   error: CustomError
   paginationOutput: PaginationOutput
   users: [User!]
+}
+
+type ThongKeOuput {
+  ok: Boolean!
+  error: CustomError
+  soNguoiDangKi: Float
+  soDonHangThangNay: Float
+  soNhanVien: Float
+  soSanPham: Float
+  doanhThuTrongThang: Float
+  sanPhamBanChay: [SanPham!]
+  tienLuongCuaTatCaNhanVien: Float
 }
 
 input StoredFileInputType {
@@ -260,6 +286,8 @@ type Query {
   xemThongTinNguoiDung: XemThongTinNguoiDungOutput!
   xemThongTinNguoiDungChoQuanLi(input: XemThongTinNguoiDungChoQuanLiInput!): XemThongTinNguoiDungOutput!
   xemDanhSachNguoiDung(input: XemDanhSachNguoiDungInput!): XemDanhSachNguoiDungOutput!
+  xemDanhSachMaGiamGiaChoUser: XemDanhSachMaGiamGiaOutput!
+  ThongKeChoQuanLy: ThongKeOuput!
   login(input: LoginInput!): LoginOutput!
   newAccessToken(input: NewAccessTokenInput!): NewAccessTokenOutput!
   xemThongTinSanPham(input: XemThongTinSanPhamInput!): XemThongTinSanPhamOutput!
@@ -322,7 +350,6 @@ input XemThongTinDonHangChoQuanLiInput {
 
 input XemDanhSachDonHangInput {
   paginationInput: PaginationInput!
-  ngayMua: DateTime
 }
 
 input XemThongTinMaGiamGiaChoQuanLiInput {
@@ -344,6 +371,8 @@ type Mutation {
   addNhanVien(input: AddNhanVienInput!): AddNhanVienOutput!
   editNhanVien(input: EditNhanVienInput!): EditNhanVienOutput!
   addDonHang(input: AddDonHangInput!): AddDonHangOutput!
+  addDonHangChoUser(input: AddDonHangChoUserInput!): AddDonHangOutput!
+  editDonHang(input: EditDonHangInput!): EditDonHangOutput!
   addMaGiamGia(input: AddMaGiamGiaInput!): AddMaGiamGiaOutput!
 }
 
@@ -352,6 +381,29 @@ input AddUserInput {
   ten: String!
   gioiTinh: String!
   avatar: StoredFileInputType
+  maGiamGia: [MaGiamGiaInputType!]
+  ghiChu: String
+}
+
+input MaGiamGiaInputType {
+  codeVoucher: String!
+  minAmount: Float!
+  user: UserInputType!
+  voucherAmount: Float!
+  startDate: DateTime!
+  endDate: DateTime!
+  typeDiscount: TypeDiscount!
+}
+
+input UserInputType {
+  matKhau: String
+  soDienThoai: String
+  vaiTroNguoiDung: VaitroNguoiDung!
+  daDangKi: Boolean!
+  ten: String!
+  gioiTinh: String!
+  avatar: StoredFileInputType
+  maGiamGia: [MaGiamGiaInputType!]
   ghiChu: String
 }
 
@@ -368,6 +420,8 @@ input EditUserInput {
 input RegisterUserInput {
   matKhau: String
   soDienThoai: String
+  ten: String!
+  maGiamGia: [MaGiamGiaInputType!]
   matKhauLapLai: String!
 }
 
@@ -396,32 +450,28 @@ input EditSanPhamInput {
 }
 
 input AddNhanVienInput {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
   chiNhanh: String!
   ngayBatDauLam: DateTime
   MailLienHe: String!
   canCuocCongDan: String
   caLamViec: CaLamViec!
   luong: Float!
+  soDienThoai: String!
+  ten: String!
+  gioiTinh: String!
 }
 
 input EditNhanVienInput {
-  id: ID
-  createdAt: DateTime
-  updatedAt: DateTime
   chiNhanh: String
-  ngayBatDauLam: DateTime
   MailLienHe: String
   canCuocCongDan: String
   caLamViec: CaLamViec
   luong: Float
-  nguoiEditId: ID!
 }
 
 input AddDonHangInput {
   hinhThucMua: HinhThucMua!
+  trangThaiDonHang: TrangThaiDonHang!
   diaChi: String!
   codeVoucher: String
   sanPham: [Order!]!
@@ -431,6 +481,19 @@ input AddDonHangInput {
 input Order {
   sanPhamId: ID!
   numberSanPham: Float!
+}
+
+input AddDonHangChoUserInput {
+  hinhThucMua: HinhThucMua!
+  trangThaiDonHang: TrangThaiDonHang!
+  diaChi: String!
+  codeVoucher: String
+  sanPham: [Order!]!
+  soDienThoai: Float!
+}
+
+input EditDonHangInput {
+  donHangId: Float!
 }
 
 input AddMaGiamGiaInput {

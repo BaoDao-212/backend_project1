@@ -13,8 +13,19 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { MaGiamGia } from 'src/donhang/entities/magiamgia.entity';
 import { StoredFile } from 'src/upload/object/StoredFile';
-import { BeforeInsert, BeforeUpdate, Column, Entity, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 
 export enum VaitroNguoiDung {
   Admin = 'Admin',
@@ -63,13 +74,18 @@ export class User extends CoreEntity {
   @Field()
   @Column()
   @IsIn(['Nam', 'Nữ'])
-  gioiTinh: string;
+  gioiTinh?: string;
 
   @Field(() => StoredFile, { nullable: true })
   @Column('json', { nullable: true })
   @ValidateNested()
   @IsOptional()
   avatar?: StoredFile;
+
+  @Field(() => [MaGiamGia], { nullable: true })
+  @ManyToMany(() => MaGiamGia)
+  @JoinTable()
+  maGiamGia?: MaGiamGia[];
 
   @Field({ nullable: true })
   @Column({ nullable: true })

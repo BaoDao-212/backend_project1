@@ -6,29 +6,44 @@ import {
   OmitType,
   PartialType,
 } from '@nestjs/graphql';
+import { IsIn } from 'class-validator';
 import {
   CoreOutput,
   PaginationInput,
   PaginationOutput,
 } from 'src/common/dto/output.dto';
+import { In } from 'typeorm';
 import { NhanVien } from '../entities/nhanvien.entity';
 
 @InputType()
 export class AddNhanVienInput extends OmitType(NhanVien, [
-  'nguoiQuanLy',
   'nhanVien',
-]) {}
+  'id',
+  'createdAt',
+  'updatedAt',
+]) {
+  @Field()
+  soDienThoai: string;
+  @Field()
+  ten: string;
+  @Field()
+  @IsIn(['Nam', 'Nu'])
+  gioiTinh: string;
+}
 
 @ObjectType()
 export class AddNhanVienOutput extends CoreOutput {}
 
 @InputType()
 export class EditNhanVienInput extends PartialType(
-  OmitType(NhanVien, ['nguoiQuanLy', 'nhanVien']),
-) {
-  @Field(() => ID)
-  nguoiEditId: number;
-}
+  OmitType(NhanVien, [
+    'nhanVien',
+    'id',
+    'createdAt',
+    'updatedAt',
+    'ngayBatDauLam',
+  ]),
+) {}
 
 @ObjectType()
 export class EditNhanVienOutput extends CoreOutput {}
@@ -65,27 +80,3 @@ export class XemDanhSachNhanVienOutput extends CoreOutput {
   @Field(() => [NhanVien], { nullable: true })
   nhanViens?: NhanVien[];
 }
-
-// @ObjectType()
-// export class ThongKeNhanVienOuput extends CoreOutput {
-//   @Field(() => Number, { nullable: true })
-//   soNguoiDangKi?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soNguoiDangKiTamTru?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soNguoiDangKiTamVang?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soHo?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soNguoiDuoiLaoDong?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soNguoiTrongLaoDong?: number;
-
-//   @Field(() => Number, { nullable: true })
-//   soNguoiTrenLaoDong?: number;
-// }

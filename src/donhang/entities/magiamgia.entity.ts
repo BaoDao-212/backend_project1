@@ -6,7 +6,8 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 export enum TypeDiscount {
   FreeShip = 'FreeShip',
   ProductDiscount = 'ProductDiscount',
@@ -26,6 +27,10 @@ export class MaGiamGia extends CoreEntity {
   @Field()
   @Column()
   minAmount: number;
+
+  @Field(() => User)
+  @ManyToMany(() => User)
+  user?: User;
 
   @Field()
   @Column()

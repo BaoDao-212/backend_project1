@@ -6,6 +6,8 @@ import { User } from 'src/user/entities/user.entity';
 export class RegisterUserInput extends PickType(User, [
   'soDienThoai',
   'matKhau',
+  'ten',
+  'maGiamGia',
 ]) {
   @Field()
   matKhauLapLai: string;

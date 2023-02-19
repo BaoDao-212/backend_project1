@@ -1,14 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { compare } from 'bcrypt';
 import { omitBy } from 'lodash';
 import { SortOrder } from 'src/common/entities/core.entity';
 import { createError } from 'src/common/utils/createError';
+import { XemDanhSachMaGiamGiaOutput } from 'src/donhang/dto/magiamgia.dto';
+import { DonHang } from 'src/donhang/entities/donhang.entity';
+import { MaGiamGia } from 'src/donhang/entities/magiamgia.entity';
+import { NhanVien } from 'src/nhanvien/entities/nhanvien.entity';
+import { SanPham, TrangThai } from 'src/sanpham/entities/sanpham.entity';
 import { ILike, Repository, IsNull, In, LessThan, MoreThan } from 'typeorm';
 import {
   AddUserInput,
   AddUserOutput,
   EditUserInput,
   EditUserOutput,
+  ThongKeOuput,
+  XemDanhSachMaGiamGiaChoUserOutput,
   XemDanhSachNguoiDungInput,
   XemDanhSachNguoiDungOutput,
   XemThongTinNguoiDungChoQuanLiInput,
@@ -21,6 +29,14 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    @InjectRepository(NhanVien)
+    private readonly NhanVienRepo: Repository<NhanVien>,
+    @InjectRepository(SanPham)
+    private readonly SanPhamRepo: Repository<SanPham>,
+    @InjectRepository(MaGiamGia)
+    private readonly MaGiamGiaRepo: Repository<MaGiamGia>,
+    @InjectRepository(DonHang)
+    private readonly DonHangRepo: Repository<DonHang>,
   ) {}
 
   // quản lí thêm người dùng
@@ -31,7 +47,8 @@ export class UserService {
           soDienThoai: input.soDienThoai,
         },
       });
-      if (user) return createError('Input', 'Đã tồn tại căn cước công dân này');
+      if (user) return createError('Input', 'Đã tồn tại số điện thoại này');
+
       await this.userRepo.save(this.userRepo.create({ ...input }));
     } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');
@@ -68,9 +85,23 @@ export class UserService {
         where: { id: input.userId },
       });
       if (!user) return createError('Input', 'Người dùng không tồn tại');
+      const donHang = await this.DonHangRepo.find({
+        where: {
+          nguoiMua: {
+            id: user.id,
+          },
+        },
+      });
+      const soLuongDonHang = donHang.length;
+      const tongTienDaMua = donHang
+        .map((dh) => dh.tongTienPhaiTra)
+        .reduce((a, b) => a + b, 0);
+
       return {
         ok: true,
         user,
+        tongTienDaMua,
+        soLuongDonHang,
       };
     } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');
@@ -132,6 +163,111 @@ export class UserService {
         },
       };
     } catch (error) {
+      return createError('Server', 'Lỗi server, thử lại sau');
+    }
+  }
+  async thongKeChoQuanLy(): Promise<ThongKeOuput> {
+    try {
+      const numberOfUser = await this.userRepo.count();
+      const [nhanvien, numberOfNhanVien] =
+        await this.NhanVienRepo.findAndCount();
+      const numberOfSanPham = await this.SanPhamRepo.count({
+        where: {
+          trangThai: TrangThai.DangBan,
+        },
+      });
+      const [donhangthangnay, soDonHangThangNay] =
+        await this.DonHangRepo.findAndCount({
+          where: {
+            ngayMua:
+              LessThan(new Date()) &&
+              MoreThan(new Date(new Date().getMonth() - 1)),
+          },
+        });
+
+      if (new Date().getDay() == 1) {
+        const sanPhamBanChay = await this.SanPhamRepo.find({
+          relations: {
+            donHang: {
+              sanPham: true,
+            },
+          },
+        });
+        const thongkesp = sanPhamBanChay.map((sp) => {
+          const soluong = sp.donHang
+            .map((dh) => {
+              const idsp = dh.sanPham.findIndex((spp) => spp.id == sp.id);
+              return dh.soluong[idsp];
+            })
+            .reduce((p, c) => p + +c, 0);
+          return { ten: sp.ten, soluong };
+        });
+        thongkesp.sort(function (b, a) {
+          return a.soluong - b.soluong;
+        });
+        const json = JSON.stringify(thongkesp.slice(0, 5));
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const fs = require('fs');
+        fs.writeFile('../backend_project1/src/datathongkesp', json, (err) => {
+          if (err) throw err;
+        });
+        console.log(json);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fs = require('fs');
+      const spBC = JSON.parse(
+        fs.readFileSync('../backend_project1/src/datathongkesp').toString(),
+      );
+      const nameOfSanPhamBanChay = spBC.map((js) => js.ten);
+      const sanPhamBanChay = await this.SanPhamRepo.find({
+        where: {
+          ten: In(nameOfSanPhamBanChay),
+        },
+        relations: {
+          donHang: true,
+        },
+      });
+      console.log(sanPhamBanChay);
+      const tienLuongCuaTatCaNhanVien = nhanvien
+        .map((nv) => nv.luong)
+        .reduce((a, b) => a + b, 0);
+      const doanhThuTrongThang = donhangthangnay
+        .map((dh) => dh.tongTienPhaiTra)
+        .reduce((a, b) => a + b, 0);
+      return {
+        sanPhamBanChay,
+        soSanPham: numberOfSanPham,
+        soNhanVien: numberOfNhanVien,
+        soNguoiDangKi: numberOfUser,
+        soDonHangThangNay,
+        tienLuongCuaTatCaNhanVien,
+        doanhThuTrongThang,
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return createError('Server', 'Lỗi server, thử lại sau');
+    }
+  }
+
+  async xemDanhSachMaGiamGiaChoUser(
+    currentUser: User,
+  ): Promise<XemDanhSachMaGiamGiaChoUserOutput> {
+    try {
+      const user = await this.userRepo.findOne({
+        where: {
+          id: currentUser.id,
+        },
+        relations: {
+          maGiamGia: true,
+        },
+      });
+      return {
+        ok: true,
+        maGiamGias: user.maGiamGia,
+      };
+    } catch (error) {
+      console.log(error);
       return createError('Server', 'Lỗi server, thử lại sau');
     }
   }

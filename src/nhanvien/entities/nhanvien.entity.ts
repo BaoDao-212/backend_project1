@@ -24,10 +24,6 @@ registerEnumType(CaLamViec, {
 export class NhanVien extends CoreEntity {
   @Field()
   @ManyToOne(() => User)
-  nguoiQuanLy: User;
-
-  @Field()
-  @ManyToOne(() => User)
   nhanVien: User;
 
   @Field()
