@@ -36,11 +36,14 @@ export class AddNhanVienOutput extends CoreOutput {}
 
 @InputType()
 export class EditNhanVienInput extends PartialType(
-  OmitType(NhanVien, ['nhanVien']),
-) {
-  @Field(() => ID)
-  nguoiEditId: number;
-}
+  OmitType(NhanVien, [
+    'nhanVien',
+    'id',
+    'createdAt',
+    'updatedAt',
+    'ngayBatDauLam',
+  ]),
+) {}
 
 @ObjectType()
 export class EditNhanVienOutput extends CoreOutput {}

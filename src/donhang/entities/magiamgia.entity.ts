@@ -30,7 +30,7 @@ export class MaGiamGia extends CoreEntity {
 
   @Field(() => User)
   @ManyToMany(() => User)
-  user: User;
+  user?: User;
 
   @Field()
   @Column()

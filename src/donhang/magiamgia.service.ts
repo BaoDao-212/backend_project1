@@ -76,7 +76,7 @@ export class MaGiamGiaService {
     }
   }
 
-  // xem danh sach nguoi dung cho quan li
+  // xem danh sach voucher cho quan li
   async xemDanhSachMaGiamGia(
     input: XemDanhSachMaGiamGiaInput,
   ): Promise<XemDanhSachMaGiamGiaOutput> {

@@ -4,6 +4,7 @@ import { compare } from 'bcrypt';
 import { omitBy } from 'lodash';
 import { SortOrder } from 'src/common/entities/core.entity';
 import { createError } from 'src/common/utils/createError';
+import { XemDanhSachMaGiamGiaOutput } from 'src/donhang/dto/magiamgia.dto';
 import { DonHang } from 'src/donhang/entities/donhang.entity';
 import { MaGiamGia } from 'src/donhang/entities/magiamgia.entity';
 import { NhanVien } from 'src/nhanvien/entities/nhanvien.entity';
@@ -15,12 +16,12 @@ import {
   EditUserInput,
   EditUserOutput,
   ThongKeOuput,
+  XemDanhSachMaGiamGiaChoUserOutput,
   XemDanhSachNguoiDungInput,
   XemDanhSachNguoiDungOutput,
   XemThongTinNguoiDungChoQuanLiInput,
   XemThongTinNguoiDungOutput,
 } from './dto/user.dto';
-import { TopSP } from './entities/thongke.entity';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -36,13 +37,7 @@ export class UserService {
     private readonly MaGiamGiaRepo: Repository<MaGiamGia>,
     @InjectRepository(DonHang)
     private readonly DonHangRepo: Repository<DonHang>,
-    @InjectRepository(TopSP)
-    private readonly TopSPRepo: Repository<TopSP>,
-  ) {
-    this.thongKeChoQuanLy().then(() => {
-      console.log('hee');
-    });
-  }
+  ) {}
 
   // quản lí thêm người dùng
   async addUser(input: AddUserInput): Promise<AddUserOutput> {
@@ -52,7 +47,8 @@ export class UserService {
           soDienThoai: input.soDienThoai,
         },
       });
-      if (user) return createError('Input', 'Đã tồn tại căn cước công dân này');
+      if (user) return createError('Input', 'Đã tồn tại số điện thoại này');
+
       await this.userRepo.save(this.userRepo.create({ ...input }));
     } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');
@@ -89,9 +85,23 @@ export class UserService {
         where: { id: input.userId },
       });
       if (!user) return createError('Input', 'Người dùng không tồn tại');
+      const donHang = await this.DonHangRepo.find({
+        where: {
+          nguoiMua: {
+            id: user.id,
+          },
+        },
+      });
+      const soLuongDonHang = donHang.length;
+      const tongTienDaMua = donHang
+        .map((dh) => dh.tongTienPhaiTra)
+        .reduce((a, b) => a + b, 0);
+
       return {
         ok: true,
         user,
+        tongTienDaMua,
+        soLuongDonHang,
       };
     } catch (error) {
       return createError('Server', 'Lỗi server, thử lại sau');
@@ -159,29 +169,30 @@ export class UserService {
   async thongKeChoQuanLy(): Promise<ThongKeOuput> {
     try {
       const numberOfUser = await this.userRepo.count();
-      const numberOfNhanVien = await this.NhanVienRepo.count();
+      const [nhanvien, numberOfNhanVien] =
+        await this.NhanVienRepo.findAndCount();
       const numberOfSanPham = await this.SanPhamRepo.count({
         where: {
           trangThai: TrangThai.DangBan,
         },
       });
-      const soDonHang = await this.DonHangRepo.count();
-      const DonHangThangNay = await this.DonHangRepo.find({
-        where: {
-          ngayMua:
-            LessThan(new Date()) &&
-            MoreThan(new Date(new Date().getMonth() - 1)),
-        },
-      });
-
-      const sanPhamBanChay = await this.SanPhamRepo.find({
-        relations: {
-          donHang: {
-            sanPham: true,
+      const [donhangthangnay, soDonHangThangNay] =
+        await this.DonHangRepo.findAndCount({
+          where: {
+            ngayMua:
+              LessThan(new Date()) &&
+              MoreThan(new Date(new Date().getMonth() - 1)),
           },
-        },
-      });
+        });
+
       if (new Date().getDay() == 1) {
+        const sanPhamBanChay = await this.SanPhamRepo.find({
+          relations: {
+            donHang: {
+              sanPham: true,
+            },
+          },
+        });
         const thongkesp = sanPhamBanChay.map((sp) => {
           const soluong = sp.donHang
             .map((dh) => {
@@ -204,21 +215,56 @@ export class UserService {
       }
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
-      const jo = fs.readFile(
-        '../backend_project1/src/datathongkesp',
-        function (err, data) {
-          if (err) {
-            return console.error(err);
-          }
-          console.log(d);
-          
-          return data.toString();
-        },
+      const spBC = JSON.parse(
+        fs.readFileSync('../backend_project1/src/datathongkesp').toString(),
       );
-      console.log(jo);
+      const nameOfSanPhamBanChay = spBC.map((js) => js.ten);
+      const sanPhamBanChay = await this.SanPhamRepo.find({
+        where: {
+          ten: In(nameOfSanPhamBanChay),
+        },
+        relations: {
+          donHang: true,
+        },
+      });
+      console.log(sanPhamBanChay);
+      const tienLuongCuaTatCaNhanVien = nhanvien
+        .map((nv) => nv.luong)
+        .reduce((a, b) => a + b, 0);
+      const doanhThuTrongThang = donhangthangnay
+        .map((dh) => dh.tongTienPhaiTra)
+        .reduce((a, b) => a + b, 0);
+      return {
+        sanPhamBanChay,
+        soSanPham: numberOfSanPham,
+        soNhanVien: numberOfNhanVien,
+        soNguoiDangKi: numberOfUser,
+        soDonHangThangNay,
+        tienLuongCuaTatCaNhanVien,
+        doanhThuTrongThang,
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return createError('Server', 'Lỗi server, thử lại sau');
+    }
+  }
 
+  async xemDanhSachMaGiamGiaChoUser(
+    currentUser: User,
+  ): Promise<XemDanhSachMaGiamGiaChoUserOutput> {
+    try {
+      const user = await this.userRepo.findOne({
+        where: {
+          id: currentUser.id,
+        },
+        relations: {
+          maGiamGia: true,
+        },
+      });
       return {
         ok: true,
+        maGiamGias: user.maGiamGia,
       };
     } catch (error) {
       console.log(error);

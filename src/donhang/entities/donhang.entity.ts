@@ -22,6 +22,14 @@ import {
   Unique,
 } from 'typeorm';
 
+export enum TrangThaiDonHang {
+  Oke = 'Oke',
+  ChoPheDuyet = 'ChoPheDuyet',
+}
+
+registerEnumType(TrangThaiDonHang, {
+  name: 'TrangThaiDonHang',
+});
 export enum HinhThucMua {
   MangVe = 'MangVe',
   NgoiTaiQuan = 'NgoiTaiQuan',
@@ -66,4 +74,8 @@ export class DonHang extends CoreEntity {
   @Field(() => HinhThucMua)
   @Column('enum', { enum: HinhThucMua })
   hinhThucMua: HinhThucMua;
+
+  @Field(() => TrangThaiDonHang)
+  @Column('enum', { enum: TrangThaiDonHang })
+  trangThaiDonHang?: TrangThaiDonHang;
 }

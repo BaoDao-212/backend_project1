@@ -1,11 +1,13 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Roles } from 'src/auth/role.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
+import { XemDanhSachMaGiamGiaOutput } from 'src/donhang/dto/magiamgia.dto';
 import {
   AddUserInput,
   AddUserOutput,
   EditUserInput,
   EditUserOutput,
+  ThongKeOuput,
   XemDanhSachNguoiDungInput,
   XemDanhSachNguoiDungOutput,
   XemThongTinNguoiDungChoQuanLiInput,
@@ -48,5 +50,15 @@ export class UserResolver {
   @Roles(['Admin', 'QuanLy'])
   xemDanhSachNguoiDung(@Args('input') input: XemDanhSachNguoiDungInput) {
     return this.userService.xemDanhSachNguoiDung(input);
+  }
+  @Query(() => XemDanhSachMaGiamGiaOutput)
+  @Roles(['Any'])
+  xemDanhSachMaGiamGiaChoUser(@CurrentUser() user: User) {
+    return this.userService.xemDanhSachMaGiamGiaChoUser(user);
+  }
+  @Query(() => ThongKeOuput)
+  @Roles(['Admin', 'QuanLy'])
+  ThongKeChoQuanLy() {
+    return this.userService.thongKeChoQuanLy();
   }
 }

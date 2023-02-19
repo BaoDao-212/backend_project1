@@ -42,9 +42,38 @@ export class AddDonHangInput extends OmitType(DonHang, [
   @Field()
   PhiShip?: number;
 }
+@InputType()
+export class AddDonHangChoUserInput extends OmitType(DonHang, [
+  'id',
+  'createdAt',
+  'updatedAt',
+  'nguoiMua',
+  'sanPham',
+  'maGiamGia',
+  'ngayMua',
+  'tongTienPhaiTra',
+  'ghiChu',
+  'soluong',
+]) {
+  @Field()
+  diaChi?: string;
+  @Field({ nullable: true })
+  codeVoucher?: string;
+  @Field(() => [Order])
+  sanPham?: Order[];
+  @Field()
+  soDienThoai?: number;
+}
 
 @ObjectType()
 export class AddDonHangOutput extends CoreOutput {}
+@InputType()
+export class EditDonHangInput {
+  @Field()
+  donHangId: number;
+}
+@ObjectType()
+export class EditDonHangOutput extends CoreOutput {}
 
 @ObjectType()
 export class XemThongTinDonHangChoQuanLiOutput extends CoreOutput {
@@ -62,9 +91,11 @@ export class XemThongTinDonHangChoQuanLiInput {
 export class XemDanhSachDonHangInput {
   @Field(() => PaginationInput)
   paginationInput: PaginationInput;
-
-  @Field({ nullable: true })
-  ngayMua?: Date;
+}
+@InputType()
+export class XemDanhSachDonHangChoNhanVienInput {
+  @Field(() => PaginationInput)
+  paginationInput: PaginationInput;
 }
 
 @ObjectType()

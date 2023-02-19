@@ -11,6 +11,7 @@ export class AddMaGiamGiaInput extends OmitType(MaGiamGia, [
   'id',
   'createdAt',
   'updatedAt',
+  'user',
 ]) {}
 
 @ObjectType()

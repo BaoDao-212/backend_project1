@@ -7,6 +7,7 @@ import {
   ACCESS_TOKEN_SECRET,
 } from 'src/common/constants/constants';
 import { createError } from 'src/common/utils/createError';
+import { MaGiamGia } from 'src/donhang/entities/magiamgia.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import {
@@ -24,6 +25,8 @@ import {
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(MaGiamGia)
+    private readonly MaGiamGiaRepo: Repository<MaGiamGia>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -32,6 +35,7 @@ export class AuthService {
     soDienThoai,
     matKhau,
     matKhauLapLai,
+    ten,
   }: RegisterUserInput): Promise<RegisterUserOutput> {
     try {
       if (matKhau !== matKhauLapLai)
@@ -41,16 +45,28 @@ export class AuthService {
           soDienThoai,
         },
       });
-      if (!user) return createError('Input', 'Số số điện thoại không phù hợp');
-      if (user.daDangKi)
-        return createError('Input', 'Tài khoản đã được đăng kí');
-      user.matKhau = matKhau;
-      user.daDangKi = true;
-      await this.userRepo.save(user);
+      if (user) return createError('Input', 'Tài khoản đã được đăng kí');
+      const maGiamGia = await this.MaGiamGiaRepo.findOne({
+        where: {
+          codeVoucher: 'FreeNewUser',
+        },
+      });
+      if (!maGiamGia) return createError('Input', 'l');
+      const userH = this.userRepo.create({
+        soDienThoai,
+        ten,
+        matKhau,
+        daDangKi: true,
+        gioiTinh: 'Nam',
+        maGiamGia: [maGiamGia],
+      });
+
+      await this.userRepo.save(userH);
       return {
         ok: true,
       };
     } catch (error) {
+      console.log(error);
       return createError('Server', 'Lỗi server, thử lại sau');
     }
   }
@@ -63,8 +79,7 @@ export class AuthService {
         },
         select: ['id', 'matKhau', 'daDangKi'],
       });
-      // if (!user)
-      //   return createError('Input', 'Số điện thoại không phù hợp');
+      if (!user) return createError('Input', 'Số điện thoại không phù hợp');
       if (!(await user.checkPassword(matKhau)))
         return createError('Input', 'Mật khẩu không đúng');
       const accessToken = sign(
@@ -81,6 +96,8 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
+      console.log(error);
+
       return createError('Server', 'Lỗi server, thử lại sau');
     }
   }

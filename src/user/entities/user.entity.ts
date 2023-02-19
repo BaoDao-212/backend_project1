@@ -74,7 +74,7 @@ export class User extends CoreEntity {
   @Field()
   @Column()
   @IsIn(['Nam', 'Nữ'])
-  gioiTinh: string;
+  gioiTinh?: string;
 
   @Field(() => StoredFile, { nullable: true })
   @Column('json', { nullable: true })

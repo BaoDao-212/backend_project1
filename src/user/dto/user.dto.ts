@@ -11,6 +11,7 @@ import {
   PaginationInput,
   PaginationOutput,
 } from 'src/common/dto/output.dto';
+import { MaGiamGia } from 'src/donhang/entities/magiamgia.entity';
 import { SanPham } from 'src/sanpham/entities/sanpham.entity';
 import { User } from '../entities/user.entity';
 
@@ -39,6 +40,7 @@ export class EditUserInput extends PartialType(
     'matKhau',
     'vaiTroNguoiDung',
     'id',
+    'maGiamGia',
   ]),
 ) {
   @Field(() => ID)
@@ -52,6 +54,10 @@ export class EditUserOutput extends CoreOutput {}
 export class XemThongTinNguoiDungOutput extends CoreOutput {
   @Field(() => User, { nullable: true })
   user?: User;
+  @Field()
+  soLuongDonHang?: number;
+  @Field()
+  tongTienDaMua?: number;
 }
 
 @InputType()
@@ -80,14 +86,16 @@ export class XemDanhSachNguoiDungOutput extends CoreOutput {
   @Field(() => [User], { nullable: true })
   users?: User[];
 }
+@ObjectType()
+export class XemDanhSachMaGiamGiaChoUserOutput extends CoreOutput {
+  @Field(() => [MaGiamGia], { nullable: true })
+  maGiamGias?: MaGiamGia[];
+}
 
 @ObjectType()
 export class ThongKeOuput extends CoreOutput {
   @Field(() => Number, { nullable: true })
   soNguoiDangKi?: number;
-
-  @Field(() => Number, { nullable: true })
-  soDonHang?: number;
 
   @Field(() => Number, { nullable: true })
   soDonHangThangNay?: number;
@@ -101,10 +109,7 @@ export class ThongKeOuput extends CoreOutput {
   @Field(() => Number, { nullable: true })
   doanhThuTrongThang?: number;
 
-  @Field(() => Number, { nullable: true })
-  doanhThu?: number;
-
-  @Field(() => SanPham, { nullable: true })
+  @Field(() => [SanPham], { nullable: true })
   sanPhamBanChay?: SanPham[];
 
   @Field(() => Number, { nullable: true })

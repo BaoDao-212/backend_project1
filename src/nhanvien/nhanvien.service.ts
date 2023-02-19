@@ -108,10 +108,22 @@ export class NhanVienService {
   async editNhanVien(input: EditNhanVienInput): Promise<EditNhanVienOutput> {
     try {
       // ghi đè các trường input không bị null hoặc undefined vào trong nguoiYeuCau
-      const updateNhanVien = {
-        ...omitBy(input, (v) => v == null || v == undefined),
-      };
-      this.NhanVienRepo.save(updateNhanVien);
+      // const updateNhanVien = {
+      //   ...omitBy(input, (v) => v == null || v == undefined),
+      // };
+      // this.NhanVienRepo.save(updateNhanVien);
+      const nhanVien = await this.NhanVienRepo.findOne({
+        where: {
+          canCuocCongDan: input.canCuocCongDan,
+        },
+      });
+      if (!nhanVien) return createError('Input', 'Không hợp lệ');
+      nhanVien.caLamViec = input.caLamViec;
+      nhanVien.MailLienHe = input.MailLienHe;
+      nhanVien.chiNhanh = input.chiNhanh;
+      nhanVien.canCuocCongDan = input.canCuocCongDan;
+      nhanVien.luong = input.luong;
+      this.NhanVienRepo.save(nhanVien);
       return {
         ok: true,
       };
