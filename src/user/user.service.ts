@@ -39,6 +39,8 @@ export class UserService {
     private readonly DonHangRepo: Repository<DonHang>,
   ) {}
 
+  //
+
   // quản lí thêm người dùng
   async addUser(input: AddUserInput): Promise<AddUserOutput> {
     try {
@@ -184,8 +186,10 @@ export class UserService {
               MoreThan(new Date(new Date().getMonth() - 1)),
           },
         });
-
-      if (new Date().getDay() == 1) {
+      const SPBC1 = [];
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fs = require('fs');
+      if (new Date().getDate() == 21) {
         const sanPhamBanChay = await this.SanPhamRepo.find({
           relations: {
             donHang: {
@@ -206,19 +210,19 @@ export class UserService {
           return a.soluong - b.soluong;
         });
         const json = JSON.stringify(thongkesp.slice(0, 5));
+        SPBC1.push(thongkesp.slice(0, 5));
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const fs = require('fs');
         fs.writeFile('../backend_project1/src/datathongkesp', json, (err) => {
           if (err) throw err;
         });
-        console.log(json);
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const spBC = JSON.parse(
+          fs.readFileSync('../backend_project1/src/datathongkesp').toString(),
+        );
+        SPBC1.push(spBC);
       }
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const fs = require('fs');
-      const spBC = JSON.parse(
-        fs.readFileSync('../backend_project1/src/datathongkesp').toString(),
-      );
-      const nameOfSanPhamBanChay = spBC.map((js) => js.ten);
+      const nameOfSanPhamBanChay = SPBC1[0].map((js) => js.ten);
       const sanPhamBanChay = await this.SanPhamRepo.find({
         where: {
           ten: In(nameOfSanPhamBanChay),
@@ -227,7 +231,6 @@ export class UserService {
           donHang: true,
         },
       });
-      console.log(sanPhamBanChay);
       const tienLuongCuaTatCaNhanVien = nhanvien
         .map((nv) => nv.luong)
         .reduce((a, b) => a + b, 0);

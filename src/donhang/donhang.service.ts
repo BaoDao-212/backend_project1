@@ -52,8 +52,7 @@ export class DonHangService {
           codeVoucher: codeVoucher,
         },
       });
-      if (hinhThucMua == HinhThucMua.NgoiTaiQuan && PhiShip > 0)
-        return createError('Input', 'Phí ship không hợp lệ');
+
       if (codeVoucher && maGiamGia && maGiamGia.endDate < new Date())
         return createError('Input', 'Mã giảm giá đã hết hạn');
       let tongTienPhaiTra = PhiShip;
@@ -113,9 +112,10 @@ export class DonHangService {
   ): Promise<AddDonHangOutput> {
     try {
       const { hinhThucMua, codeVoucher, diaChi, soDienThoai } = input;
+      // if (codeVoucher == undefined) codeVoucher = '';
       const maGiamGia = await this.MaGiamGiaRepo.findOne({
         where: {
-          codeVoucher: codeVoucher,
+          codeVoucher: codeVoucher || '',
         },
       });
 
@@ -211,7 +211,10 @@ export class DonHangService {
           nguoiMua: true,
         },
       });
-      if (DonHang.nguoiMua.id != currentUser.id)
+      if (
+        DonHang.nguoiMua.id != currentUser.id &&
+        currentUser.vaiTroNguoiDung == VaitroNguoiDung.KhachHang
+      )
         return createError('Input', 'Yêu cầu không hợp lệ');
       if (!DonHang) return createError('Input', 'Đơn hàng không tồn tại');
       return {
